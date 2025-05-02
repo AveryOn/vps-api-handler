@@ -9,7 +9,7 @@
     "build": "vite build",
     "start": "node dist/index.cjs",
     "pm2:start": "pm2 start npm --name vps-api-handler -- run start",
-    "pm2:stop":  "pm2 stop vps-api-handler",
+    "pm2:stop": "pm2 stop vps-api-handler",
     "pm2:restart": "pm2 restart vps-api-handler"
   },
   "keywords": [],
@@ -17,6 +17,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@octokit/webhooks": "^13.8.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

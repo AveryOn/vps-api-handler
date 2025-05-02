@@ -1,15 +1,13 @@
-import express from 'express'
+import express, { type Request } from 'express'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import { config } from 'dotenv'
-import { verifyGitHubSignature } from './utils/github-hmac-signature'
-import { createHmac, timingSafeEqual } from 'crypto'
+import { verifySignature } from './utils/github-hmac-signature'
 config()
 
 const app = express()
 const PORT = process.env.PORT ?? 4000
-app.set('trust proxy', true)
 
 // 1) CORS
 const corsOptions = {
@@ -28,7 +26,8 @@ app.use(rateLimit({
   windowMs: 15*60*1000,   // 15 минут
   max: 100,               // не больше 100 запросов с одного IP за window
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  validate: { trustProxy: false },
 }))
 
 // 5) Webhook GitHub
@@ -39,45 +38,31 @@ app.get('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
 
 app.post(
     '/webhooks',
-    express.raw({ type: 'application/json' }),  // чтобы req.body был Buffer
-    (req, res) => {
+    express.raw({ type: 'application/json' }),
+    async (req: Request, res) => {
       const secret = process.env.WEBHOOKS_SECRET!
-      const signature = (req.headers['x-hub-signature-256'] as string) || ''
-      const [_, hash] = signature.split('=')
+      const signature = req.headers['x-hub-signature-256']
+      if (!signature) {
+        res.status(400).send('Missing X-Hub-Signature-256 header')
+      }
   
-      // 4) получаем именно буфер с сырым телом
-      const rawBody: Buffer = Buffer.isBuffer(req.body)
-        ? req.body
-        : Buffer.from(JSON.stringify(req.body))
+      const payload = req.body.toString()   // строка JSON
   
-      // 5) считаем своё HMAC
-      const hmac = createHmac('sha256', secret)
-        .update(rawBody)
-        .digest('hex')
-  
-      // 6) таймсейф сравнение
-      const valid = timingSafeEqual(
-        Buffer.from(hash, 'hex'),
-        Buffer.from(hmac, 'hex'),
-      )
-  
+      let valid = false
+      try {
+        valid = await verifySignature(secret, signature as string, payload)
+      } catch (err) {
+        console.error('Error verifying signature:', err)
+      }
       if (!valid) {
-        res.status(401).send('Invalid signature')
+        res.status(401).send('Unauthorized')
       }
-      else {
-        // 7) собираем все GitHub-заголовки
-        const ghHeaders = Object.fromEntries(
-            Object.entries(req.headers).filter(([k]) =>
-                k.startsWith('x-github-') || k.startsWith('x-hub-')
-            )
-        )
-    
-        console.log('Verified GitHub webhook headers:', ghHeaders)
-        console.log('Verified payload:', rawBody.toString())
-    
-        res.status(200).send('OK')
-
-      }
+  
+      // здесь уже безопасно обрабатывать вебхук
+      console.log('✅ Verified GitHub event:', req.headers['x-github-event'])
+      console.log('Payload:', payload)
+  
+      res.status(200).send('OK')
     }
   )
 

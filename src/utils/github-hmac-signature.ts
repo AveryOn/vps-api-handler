@@ -1,30 +1,46 @@
-import type { Request } from "express"
 import * as crypto from 'crypto'
 
-/**
- * Middleware для проверки подписи
- */
-export function verifyGitHubSignature(req: Request, signature: string): boolean {
-    if (!signature) {
-      return false
+let encoder = new TextEncoder();
+
+export async function verifySignature(secret: string, header: string, payload: string) {
+    let parts = header.split("=");
+    let sigHex = parts[1];
+
+    let algorithm = { name: "HMAC", hash: { name: 'SHA-256' } };
+
+    let keyBytes = encoder.encode(secret);
+    let extractable = false;
+    let key = await crypto.subtle.importKey(
+        "raw",
+        keyBytes,
+        algorithm,
+        extractable,
+        [ "sign", "verify" ],
+    );
+
+    let sigBytes = hexToBytes(sigHex);
+    let dataBytes = encoder.encode(payload);
+    let equal = await crypto.subtle.verify(
+        algorithm.name,
+        key,
+        sigBytes,
+        dataBytes,
+    );
+
+    return equal;
+}
+
+function hexToBytes(hex: string) {
+    let len = hex.length / 2;
+    let bytes = new Uint8Array(len);
+
+    let index = 0;
+    for (let i = 0; i < hex.length; i += 2) {
+        let c = hex.slice(i, i + 2);
+        let b = parseInt(c, 16);
+        bytes[index] = b;
+        index += 1;
     }
-  
-    const [algo, hash] = signature.split('=')
-    if (algo !== 'sha256' || !hash) {
-      return false
-    }
-  
-    // Считаем HMAC от body
-    const hmac = crypto
-      .createHmac('sha256', process.env.WEBHOOKS_SECRET)
-      .update(req.body as Buffer)
-      .digest('hex')
-  
-    // Защищённое сравнение
-    const valid = crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(hmac, 'hex'))
-    if (!valid) {
-      return false
-    }
-  
-    return true
-  }
+
+    return bytes;
+}
