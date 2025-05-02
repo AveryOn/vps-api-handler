@@ -45,7 +45,7 @@ app.post('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
     
     console.log('GitHub Event:', event)
     console.log('GitHub Signature:', signature)
-    console.log('Payload:', req.body.toString())
+    console.log('Payload:', JSON.stringify(req.body, null, 4))
 
     res.status(200).send({
         signature,
