@@ -66,7 +66,6 @@ app.post(
   
       // здесь уже безопасно обрабатывать вебхук
       console.log('✅ Verified GitHub event:', req.headers['x-github-event'])
-      console.log('Payload:', payload)
   
       res.status(200).send('OK')
     }
