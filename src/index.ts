@@ -44,6 +44,7 @@ app.post(
       const signature = req.headers['x-hub-signature-256']
       if (!signature) {
         res.status(400).send('Missing X-Hub-Signature-256 header')
+        throw 400
       }
   
       const payload = req.body.toString()   // строка JSON
@@ -53,9 +54,11 @@ app.post(
         valid = await verifySignature(secret, signature as string, payload)
       } catch (err) {
         console.error('Error verifying signature:', err)
+        throw 400
       }
       if (!valid) {
         res.status(401).send('Unauthorized')
+        throw 401
       }
   
       // здесь уже безопасно обрабатывать вебхук
