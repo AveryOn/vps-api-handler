@@ -1,5 +1,3 @@
-import * as crypto from 'crypto'
-
 let encoder = new TextEncoder();
 
 export async function verifySignature(secret: string, header: string, payload: string) {

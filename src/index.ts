@@ -3,7 +3,7 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import { config } from 'dotenv'
-import { verifySignature } from './utils/github-hmac-signature'
+import { verifySignature } from './utils/verify'
 config()
 
 const app = express()
