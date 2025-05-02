@@ -8,7 +8,7 @@ config()
 
 const app = express()
 const PORT = process.env.PORT ?? 4000
-
+app.set('trust proxy', 1)
 // 1) CORS
 const corsOptions = {
   origin: '*',
@@ -27,7 +27,10 @@ app.use(rateLimit({
   max: 100,               // не больше 100 запросов с одного IP за window
   standardHeaders: true,
   legacyHeaders: false,
-  validate: { trustProxy: false },
+  validate: { 
+    trustProxy: true,
+    xForwardedForHeader: false, 
+  },
 }))
 
 // 5) Webhook GitHub
