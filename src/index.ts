@@ -39,8 +39,10 @@ app.get('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
 
 app.post('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
     const event = req.headers['x-github-event']
-    const signature = req.headers['X-Hub-Signature-256']
+    const signature = req.headers['x-hub-signature-256']
 
+    console.log('HEADERS:', JSON.stringify(req.headers, null, 4));
+    
     console.log('GitHub Event:', event)
     console.log('GitHub Signature:', signature)
     console.log('Payload:', req.body.toString())
