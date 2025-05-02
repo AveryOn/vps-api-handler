@@ -1,0 +1,11 @@
+{
+    "watch": ["src"],
+    "ext": "ts,js,json",
+    "ignore": ["dist", "node_modules"],
+    "exec": "node --loader ts-node/esm src/index.ts",
+    "delay": "500",
+    "env": {
+      "NODE_ENV": "development"
+    }
+  }
+  

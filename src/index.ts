@@ -2,6 +2,8 @@ import express from 'express'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
+import { config } from 'dotenv'
+config()
 
 const app = express()
 const PORT = process.env.PORT ?? 4000
@@ -30,11 +32,16 @@ app.use(rateLimit({
 app.use(express.json())
 
 // 5) Webhook GitHub
-app.post('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
-  // тут можешь проверять подпись: req.headers['x-hub-signature']
+app.get('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
   console.log('GitHub Event:', req.headers['x-github-event'])
   console.log('Payload:', req.body.toString())
   res.status(200).send('OK')
+})
+
+app.post('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
+    console.log('GitHub Event:', req.headers['x-github-event'])
+    console.log('Payload:', req.body.toString())
+    res.status(200).send('OK')
 })
 
 app.listen(PORT, () => {
