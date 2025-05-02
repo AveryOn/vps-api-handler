@@ -7,7 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
     "build": "vite build",
-    "start": "node dist/index.cjs"
+    "start": "node dist/index.cjs",
+    "pm2:start": "pm2 start npm --name vps-api-handler -- run start",
+    "pm2:stop":  "pm2 stop vps-api-handler",
+    "pm2:restart": "pm2 restart vps-api-handler"
   },
   "keywords": [],
   "author": "",
