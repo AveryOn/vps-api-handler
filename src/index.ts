@@ -34,7 +34,7 @@ app.use(express.json())
 // 5) Webhook GitHub
 app.get('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
   console.log('GitHub Event:', req.headers['x-github-event'])
-  res.status(200).send(JSON.stringify(req, null, 4))
+  res.status(200).send(req.headers)
 })
 
 app.post('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
@@ -44,7 +44,7 @@ app.post('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
     console.log('GitHub Event:', event)
     console.log('GitHub Signature:', signature)
     console.log('Payload:', req.body.toString())
-    
+
     res.status(200).send({
         signature,
         event,
