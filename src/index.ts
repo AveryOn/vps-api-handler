@@ -3,6 +3,7 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import { config } from 'dotenv'
+import { verifyGitHubSignature } from './utils/github-hmac-signature'
 config()
 
 const app = express()
@@ -37,21 +38,30 @@ app.get('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
   res.status(200).send(req.headers)
 })
 
-app.post('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
-    const event = req.headers['x-github-event']
-    const signature = req.headers['x-hub-signature-256']
+app.post(
+    '/webhooks', 
+    express.raw({ type: '*/*' }), 
+    (req, res, next) => {
+        const event = req.headers['x-github-event']
+        const signature = req.headers['x-hub-signature-256']
 
-    console.log('HEADERS:', JSON.stringify(req.headers, null, 4));
-    
-    console.log('GitHub Event:', event)
-    console.log('GitHub Signature:', signature)
-    console.log('Payload:', JSON.stringify(req.body, null, 4))
+        console.log('HEADERS:', JSON.stringify(req.headers, null, 4));
 
-    res.status(200).send({
-        signature,
-        event,
+        console.log('GitHub Event:', event)
+        console.log('GitHub Signature:', signature)
+        console.log('Payload:', JSON.stringify(req.body, null, 4))
+
+        const isValidSign = verifyGitHubSignature(req, signature as string)
+        if(isValidSign) {
+            res.status(200).send('OK')
+            next()
+        }
+        else {
+            res
+            .status(401)
+            .send('Invalid signature')
+        }
     })
-})
 
 app.listen(PORT, () => {
   console.log(`🚀 Server listening on http://0.0.0.0:${PORT}`)
