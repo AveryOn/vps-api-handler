@@ -37,7 +37,7 @@ app.use(helmet())
 // 3) Rate-limit (простой DDoS-щит)
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,   // 15 минут
-  max: 100,               // не больше 100 запросов с одного IP за window
+  max: 10000,               // не больше 100 запросов с одного IP за window
   standardHeaders: true,
   legacyHeaders: false,
   validate: {
