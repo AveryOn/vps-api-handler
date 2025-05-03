@@ -14,6 +14,7 @@ export interface Deployment {
     status: string          // pending | success | failed
     created_at: string      // ISO
     // опционально:
+    repo?: string
     environment?: string
     execution_time?: string // ISO
     namespace?: string
@@ -70,11 +71,11 @@ export class DeploymentStore {
             INSERT INTO deployments (
                 id, number, commit_name, commit_hash, branch,
                 environment, script, execution_time,
-                namespace, status, end_at, created_at
+                namespace, status, end_at, created_at, repo
             ) VALUES (
                 @id, @number, @commit_name, @commit_hash, @branch,
                 @environment, @script, @execution_time,
-                @namespace, @status, @end_at, @created_at
+                @namespace, @status, @end_at, @created_at, @repo
             )
         `)
         stmt.run({
@@ -90,6 +91,7 @@ export class DeploymentStore {
             status: dep.status,
             end_at: dep.end_at ?? null,
             created_at: now,
+            repo: dep.repo,
         })
 
         return {

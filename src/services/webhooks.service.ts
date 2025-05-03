@@ -1,5 +1,5 @@
 import type { Request, Response } from "express"
-import type { GitHubPushEventPayload, GitHubWebhookHeaders } from "../types/webhooks.types"
+import type { GitHubPushEventPayload, GitHubWebhookHeaders, GitHubRepository } from "../types/webhooks.types"
 import { verifySignatureGitHub } from "../utils/verify"
 import { exec } from "child_process"
 import moment from "moment"
@@ -13,6 +13,7 @@ interface ExecuteDeploymentScript {
     branch: string,
     environment?: string | null,
     namespace?: string | null,
+    repo?: string | null,
 }
 /**
  * Общие правила при обработке вебхуков
@@ -94,7 +95,7 @@ export async function gitHubWebhookHandler(
              */
             const branch = payload.ref.replace('refs/heads/', '')
             const configs = [
-                pushForSoundSphereEngRepo(branch)
+                pushForSoundSphereEngRepo(branch, payload?.repository)
             ]
 
             const formattedDate = moment(Date.now()).format('DD.MM.YYYY_HH-mm-ss')
@@ -123,6 +124,7 @@ export async function gitHubWebhookHandler(
                         environment: config.environment,
                         execution_time: null,
                         namespace: config.namespace,
+                        repo: config.repo,
                     })
                     exec(cmd, async (err, stdout, stderr) => {
                         if (err) {
@@ -154,7 +156,7 @@ export async function gitHubWebhookHandler(
 /**
  * Инкапсулирует логику вызова deploy скрипта для проекта sound-sphere-eng
  */
-function pushForSoundSphereEngRepo(branch: string): ExecuteDeploymentScript {
+function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository): ExecuteDeploymentScript {
     try {
         const environments: Record<string, ENVIRONMENTS> = {
             dev: 'DEV',
@@ -165,11 +167,22 @@ function pushForSoundSphereEngRepo(branch: string): ExecuteDeploymentScript {
             branch === 'dev'
                 ? 'sound-sphere-eng-deploy-dev.sh'
                 : 'sound-sphere-eng-deploy-prod.sh'
+
+        let repo = null
+
+        // Опеределяем какой репозиторий обновили клиентский или серверный
+        if (repository.full_name.includes('client')) {
+            repo = 'client'
+        }
+        if (repository.full_name.includes('api') || repository.full_name.includes('server')) {
+            repo = 'server'
+        }
         return {
             script: scriptPath,
             branch,
             environment: environments[branch] ?? null,
             namespace: 'sound-sphere-eng',
+            repo: repo,
         }
     } catch (err) {
         console.error(err)
