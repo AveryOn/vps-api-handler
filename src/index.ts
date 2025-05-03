@@ -72,7 +72,7 @@ app.get('/deployments/', (req, res) => {
     </tr>
   `).join('')
 
-  const html = initTabelClient(rows)
+  const html = initTabelClient(rows, nonce)
   res.send(html)
 })
 

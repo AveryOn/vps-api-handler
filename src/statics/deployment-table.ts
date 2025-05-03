@@ -4,7 +4,7 @@
  * @param tableValue html разметка `tr`/`td` с готовыми значениями
  * @returns готовый html разметка в виде строки
  */
-export function initTabelClient(tableValue: string) {
+export function initTabelClient(tableValue: string, nonce: string) {
     const html = `<!DOCTYPE html>
     <html lang="ru">
     <head>
@@ -33,7 +33,7 @@ export function initTabelClient(tableValue: string) {
           ${tableValue}
         </tbody>
       </table>
-      <script>
+      <script nonce="${nonce}">
         async function load() {
           const res = await fetch('/deployments') // твой JSON-эндпоинт
           const data = await res.json()
