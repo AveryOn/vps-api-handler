@@ -14,6 +14,23 @@ interface ExecuteDeploymentScript {
     namespace?: string | null,
 }
 /**
+ * Общие правила при обработке вебхуков
+ */
+const RULESET = {
+    /**
+     * Имена веток, которые допустимы для применения деплоя в среде
+     */
+    enabled_branch_names: [
+        'dev',
+        'main',
+        'master',
+        'develop',
+        'prod',
+        'production',
+    ] as string[]
+} as const
+
+/**
  * Защита контроллера для вебхука пришедшего с гитхаба
  * @param req - объект запроса express
  * @returns {Promise<GitHubGuardResponse>} - объект полезной нагрузки вебхука
@@ -89,6 +106,10 @@ export async function gitHubWebhookHandler(
                 const now = new Date().toISOString()
                 const nowMs = Date.now()
     
+                if(!RULESET.enabled_branch_names.includes(config.branch)) {
+                    return void 0
+                }
+
                 console.log(`🚀 Starting deploy for commit ${commitSha}`)
     
                 await new Promise<void>((resolve, reject) => {
