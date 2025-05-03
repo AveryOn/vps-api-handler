@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import { config } from 'dotenv'
 import { gitHubWebhookControllerGuard, gitHubWebhookHandler } from './services/webhooks.service'
+import { randomBytes } from 'crypto'
 config()
 
 // DataBase
@@ -47,6 +48,14 @@ app.use(rateLimit({
 
 // HTML-таблица с деплойами и авто-обновлением
 app.get('/deployments/', (req, res) => {
+  // 1) Генерим случайный nonce
+  const nonce = randomBytes(16).toString('base64')
+  // 2) Вешаем CSP, разрешая только наш inline-скрипт с этим nonce
+  res.setHeader(
+    'Content-Security-Policy',
+    `default-src 'self'; script-src 'self' 'nonce-${nonce}'`
+  )
+
   const rows = deployments.findAll().map(d => `
     <tr>
       <td>${d.number}</td>
