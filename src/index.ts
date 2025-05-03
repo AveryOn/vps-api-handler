@@ -69,7 +69,7 @@ app.post(
   
       // здесь уже безопасно обрабатывать вебхук
       console.log('✅ Verified GitHub event:', req.headers['x-github-event'])
-      console.debug('BODY', req.body);
+      console.debug('BODY', JSON.parse(req.body.toString('utf-8')));
       
       res.status(200).send('OK')
     }
