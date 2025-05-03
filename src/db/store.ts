@@ -118,6 +118,13 @@ export class DeploymentStore {
             .get(id) as Deployment | undefined
     }
 
+    /** Находит деплой по commit_hash */
+    findByHash(hash: string): Deployment[] | undefined {
+        return this.db
+            .prepare('SELECT * FROM deployments WHERE commit_hash = ?')
+            .all([hash]) as Deployment[] | undefined
+    }
+
     /** Обновляет статус и/или поля деплоя */
     update(id: string, patch: Partial<Omit<Deployment, 'id' | 'number' | 'created_at'>>) {
         const fields = Object.keys(patch)

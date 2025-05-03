@@ -76,6 +76,11 @@ app.use(express.json())
  * GET ALL Deployments
  */
 app.get('/deployments', (req, res) => {
+  const commit_hash = req.query['commit_hash']
+  if(commit_hash) {
+    res.json(deployments.findByHash(commit_hash as string))
+    return
+  }
   res.json(deployments.findAll())
 })
 
@@ -150,7 +155,50 @@ app.get('/deployments/history', (req, res) => {
     </tr>
   `).join('')
 
-  const html = initTabelClient(rows, nonce)
+  const html = initTabelClient(rows, nonce, '/deployments')
+  // 4) Отдать HTML, вставив nonce в оба тега
+  res.send(html)
+})
+
+// HTML-таблица с выбраннм по hash деплоями
+app.get('/deployments/history/:commit_hash', (req, res) => {
+  const commit_hash = req.params['commit_hash']
+  if(!commit_hash) {
+    res.status(400).send('invalid input data')
+    return
+  }
+
+  // 1) Сгенерировать nonce
+  const nonce = randomBytes(16).toString('base64')
+
+  // 2) Выдать CSP, разрешив наш inline-скрипт и inline-стили с этим nonce
+  res.setHeader(
+    'Content-Security-Policy',
+    [
+      `default-src 'self'`,
+      `script-src 'self' 'nonce-${nonce}'`,
+      `style-src 'self' 'nonce-${nonce}'`
+    ].join('; ')
+  )
+
+  // 3) Построить строки таблицы
+  const rows = deployments.findByHash(commit_hash).map(d => `
+    <tr>
+      <td>${d.number}</td>
+      <td>${d.commit_name}</td>
+      <td>${d.commit_hash}</td>
+      <td>${d.branch}</td>
+      <td>${d.script}</td>
+      <td>${d.status}</td>
+      <td>${d.created_at}</td>
+      <td>${d.environment||''}</td>
+      <td>${d.execution_time||''}</td>
+      <td>${d.namespace||''}</td>
+      <td>${d.end_at||''}</td>
+    </tr>
+  `).join('')
+
+  const html = initTabelClient(rows, nonce, `/deployments?commit_hash=${commit_hash}`)
   // 4) Отдать HTML, вставив nonce в оба тега
   res.send(html)
 })
