@@ -41,7 +41,7 @@ export function initTabelClient(tableValue: string, nonce: string) {
             body.innerHTML = data.map(d => \`
                 <tr>
                 <td>\${d.number}</td>
-                <td>\${d.commit}</td>
+                <td>\${d.commit_name}</td>
                 <td>\${d.commit_hash}</td>
                 <td>\${d.branch}</td>
                 <td>\${d.script}</td>

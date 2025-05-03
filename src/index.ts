@@ -46,10 +46,77 @@ app.use(rateLimit({
   },
 }))
 
-// до любых catch-all или статики
+app.post(
+  '/webhooks',
+  express.raw({ type: 'application/json' }),
+  async (req: Request, res) => {
+
+    // Если вебхук пришел с гитхаба
+    if (req.headers['user-agent'].toLocaleLowerCase().includes('github')) {
+      const body = await gitHubWebhookControllerGuard(req)
+      try {
+        await gitHubWebhookHandler(body.payload, body.event)
+        res.status(200).send('Deploy triggered')
+        return
+      } catch (err) {
+        console.error(err)
+        res.status(500).send('Deploy failed')
+        return
+      }
+    }
+    res.status(200).send('OK')
+    return
+  }
+)
+
+app.use(express.json())
+
+
+/**
+ * GET ALL Deployments
+ */
 app.get('/deployments', (req, res) => {
   res.json(deployments.findAll())
 })
+
+/**
+ * CREATE Deployment
+ */
+app.post('/deployments', (req, res) => {
+  const body = req.body
+  if(!body) {
+    res.status(400).send('invalid input')
+    return
+  }
+  try {
+    const newDeployment = deployments.create(body)
+    res.send(newDeployment)
+
+  } catch (err) {
+    res.status(500).send('Не удалось создать запись для deploy')
+  }
+})
+
+
+/**
+ * UPDATE Deployment
+*/
+app.patch('/deployments/update/:id', (req, res) => {
+  const body = req.body
+  const id = req.params['id']
+  if(!id || !body) {
+    res.status(400).send('invalid input data')
+    return
+  }
+  try {
+    deployments.update(id, body)
+    res.send(true)
+
+  } catch (err) {
+    res.status(500).send('Не удалось создать запись для deploy')
+  }
+})
+
 
 // HTML-таблица с деплойами и авто-обновлением
 app.get('/deployments/history', (req, res) => {
@@ -87,30 +154,7 @@ app.get('/deployments/history', (req, res) => {
   // 4) Отдать HTML, вставив nonce в оба тега
   res.send(html)
 })
-app.post(
-  '/webhooks',
-  express.raw({ type: 'application/json' }),
-  async (req: Request, res) => {
 
-    // Если вебхук пришел с гитхаба
-    if (req.headers['user-agent'].toLocaleLowerCase().includes('github')) {
-      const body = await gitHubWebhookControllerGuard(req)
-      try {
-        await gitHubWebhookHandler(body.payload, body.event)
-        res.status(200).send('Deploy triggered')
-        return
-      } catch (err) {
-        console.error(err)
-        res.status(500).send('Deploy failed')
-        return
-      }
-    }
-    res.status(200).send('OK')
-    return
-  }
-)
-
-app.use(express.json())
 
 app.listen(PORT, () => {
   console.log(`🚀 Server listening on http://0.0.0.0:${PORT}`)

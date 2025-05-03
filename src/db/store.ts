@@ -49,6 +49,14 @@ export class DeploymentStore {
 
     /** Добавляет новый деплой и возвращает его */
     create(dep: Omit<Deployment, 'id' | 'created_at' | 'number'>): Deployment {
+        const findedDuplicate = this.db
+            .prepare('SELECT * FROM deployments WHERE commit_hash = ? OR commit_name = ?')
+            .get([dep.commit_hash, dep.commit_name]) as Deployment | undefined
+        
+        if(findedDuplicate) {
+            console.error('duplicate row')
+            throw 'duplicate row'
+        }
         // вычисляем next number
         const row = this.db
             .prepare('SELECT MAX(number) AS maxn FROM deployments')
@@ -94,9 +102,14 @@ export class DeploymentStore {
     /** Возвращает все деплои (по number по возрастанию) */
     findAll(): Deployment[] {
         return this.db
-            .prepare('SELECT * FROM deployments ORDER BY number')
-            .all() as Deployment[]
-    }
+          .prepare(`
+            SELECT * 
+            FROM deployments
+            ORDER BY 
+              number DESC
+          `)
+          .all() as Deployment[]
+      }
 
     /** Находит деплой по id */
     findById(id: string): Deployment | undefined {
