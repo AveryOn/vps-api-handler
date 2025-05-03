@@ -17,6 +17,9 @@ export function initTabelClient(tableValue: string, nonce: string) {
             th { background: #f0f0f0; }
             tr:nth-child(even) { background: #fafafa; }
             tr:hover { background: #f5f5f5; }
+            .td-commit-name {
+                width: 10%;
+            }
         </style>
         </head>
         <body>
@@ -41,7 +44,7 @@ export function initTabelClient(tableValue: string, nonce: string) {
             body.innerHTML = data.map(d => \`
                 <tr>
                 <td>\${d.number}</td>
-                <td>\${d.commit_name}</td>
+                <td class="td-commit-name">\${d.commit_name}</td>
                 <td>\${d.commit_hash}</td>
                 <td>\${d.branch}</td>
                 <td>\${d.script}</td>
