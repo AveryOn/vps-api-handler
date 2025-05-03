@@ -52,8 +52,8 @@ export class DeploymentStore {
     /** Добавляет новый деплой и возвращает его */
     create(dep: Omit<Deployment, 'id' | 'created_at' | 'number'>): Deployment {
         const findedDuplicate = this.db
-            .prepare('SELECT * FROM deployments WHERE commit_hash = ? OR commit_name = ?')
-            .get([dep.commit_hash, dep.commit_name]) as Deployment | undefined
+            .prepare('SELECT * FROM deployments WHERE commit_name = ?')
+            .get([dep.commit_name]) as Deployment | undefined
         
         if(findedDuplicate) {
             console.error('duplicate row')
