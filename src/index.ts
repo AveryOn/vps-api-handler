@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import { config } from 'dotenv'
 import { verifySignature } from './utils/verify'
+import { GitHubWebhookHeaders } from './types/webhooks.types'
 config()
 
 const app = express()
@@ -43,8 +44,10 @@ app.post(
     '/webhooks',
     express.raw({ type: 'application/json' }),
     async (req: Request, res) => {
+      const headers = req.headers as GitHubWebhookHeaders
       const secret = process.env.WEBHOOKS_SECRET!
-      const signature = req.headers['x-hub-signature-256']
+      const signature = headers['x-hub-signature-256']
+
       if (!signature) {
         res.status(400).send('Missing X-Hub-Signature-256 header')
         throw 400
@@ -66,7 +69,7 @@ app.post(
   
       // здесь уже безопасно обрабатывать вебхук
       console.log('✅ Verified GitHub event:', req.headers['x-github-event'])
-      console.debug('HEADERS', req.headers);
+      console.debug('BODY', req.body);
       
       res.status(200).send('OK')
     }
