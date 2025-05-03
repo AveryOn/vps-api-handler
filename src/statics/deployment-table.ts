@@ -12,13 +12,25 @@ export function initTabelClient(tableValue: string, nonce: string) {
         <title>История деплоев</title>
         <style nonce="${nonce}">
             body { font-family: sans-serif; padding: 20px; }
-            table { border-collapse: collapse; width: 100%; }
+            table { 
+                border-collapse: collapse; 
+                width: 100%; 
+                table-layout: fixed;
+                width: 100%; 
+            }
             th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
             th { background: #f0f0f0; }
             tr:nth-child(even) { background: #fafafa; }
             tr:hover { background: #f5f5f5; }
-            .td-commit-name {
+            #td-commit-name {
                 width: 10%;
+            }
+            /* зафиксировать макс. ширину столбца и включить ellipsis */
+            #td-commit-name {
+                max-width: 150px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         </style>
         </head>
@@ -44,7 +56,7 @@ export function initTabelClient(tableValue: string, nonce: string) {
             body.innerHTML = data.map(d => \`
                 <tr>
                 <td>\${d.number}</td>
-                <td class="td-commit-name">\${d.commit_name}</td>
+                <td id="td-commit-name">\${d.commit_name}</td>
                 <td>\${d.commit_hash}</td>
                 <td>\${d.branch}</td>
                 <td>\${d.script}</td>
