@@ -53,16 +53,20 @@ app.get('/deployments', (req, res) => {
 
 // HTML-таблица с деплойами и авто-обновлением
 app.get('/deployments/history', (req, res) => {
-  // 1) Генерим случайный nonce
+  // 1) Сгенерировать nonce
   const nonce = randomBytes(16).toString('base64')
 
-  // 2) Вешаем CSP, разрешая только наш inline-скрипт с этим nonce
+  // 2) Выдать CSP, разрешив наш inline-скрипт и inline-стили с этим nonce
   res.setHeader(
     'Content-Security-Policy',
-    `default-src 'self'; script-src 'self' 'nonce-${nonce}'`
+    [
+      `default-src 'self'`,
+      `script-src 'self' 'nonce-${nonce}'`,
+      `style-src 'self' 'nonce-${nonce}'`
+    ].join('; ')
   )
 
-  // 3) Собираем таблицу
+  // 3) Построить строки таблицы
   const rows = deployments.findAll().map(d => `
     <tr>
       <td>${d.number}</td>
@@ -72,26 +76,26 @@ app.get('/deployments/history', (req, res) => {
       <td>${d.script}</td>
       <td>${d.status}</td>
       <td>${d.created_at}</td>
-      <td>${d.environment || ''}</td>
-      <td>${d.execution_time || ''}</td>
-      <td>${d.namespace || ''}</td>
-      <td>${d.end_at || ''}</td>
+      <td>${d.environment||''}</td>
+      <td>${d.execution_time||''}</td>
+      <td>${d.namespace||''}</td>
+      <td>${d.end_at||''}</td>
     </tr>
   `).join('')
 
-  // 4) Возвращаем HTML, вставляя nonce в <script>
+  // 4) Отдать HTML, вставив nonce в оба тега
   res.send(`<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Deployments</title>
-  <style>
-    body{font-family:sans-serif;padding:20px}
-    table{border-collapse:collapse;width:100%}
-    th,td{border:1px solid #ccc;padding:8px;text-align:left}
-    th{background:#f0f0f0}
-    tr:nth-child(even){background:#fafafa}
-    tr:hover{background:#f5f5f5}
+  <title>История деплоев</title>
+  <style nonce="${nonce}">
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f0f0f0; }
+    tr:nth-child(even) { background: #fafafa; }
+    tr:hover { background: #f5f5f5; }
   </style>
 </head>
 <body>
@@ -135,7 +139,6 @@ app.get('/deployments/history', (req, res) => {
 </body>
 </html>`)
 })
-
 app.post(
   '/webhooks',
   express.raw({ type: 'application/json' }),
