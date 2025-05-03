@@ -49,10 +49,14 @@ app.post(
       // Если вебхук пришел с гитхаба
       if(req.headers['user-agent'].toLocaleLowerCase().includes('github')) {
         const body = await gitHubWebhookControllerGuard(req)
-        gitHubWebhookHandler(body)
+        try {
+          await gitHubWebhookHandler(body.payload, body.event)
+          res.status(200).send('Deploy triggered')
+        } catch (err) {
+          console.error(err)
+          res.status(500).send('Deploy failed')
+        }
       }
-
-      
       res.status(200).send('OK')
     }
   )
