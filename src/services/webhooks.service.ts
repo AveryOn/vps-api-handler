@@ -4,6 +4,7 @@ import { verifySignatureGitHub } from "../utils/verify"
 import { exec } from "child_process"
 import moment from "moment"
 import { DeploymentStore } from "../db/store"
+import { formatDate } from "../utils/datetime"
 
 type GitHubGuardResponse = { payload: GitHubPushEventPayload, event: string }
 type ENVIRONMENTS = 'DEV' | 'PROD' | 'LOCAL'
@@ -103,7 +104,6 @@ export async function gitHubWebhookHandler(
                 const commitName = `deploy-${formattedDate}___SHA:${commitSha}`
                 // формируем команду, передаем SHA как аргумент
                 const cmd = `bash ${config.script} ${commitName}`
-                const now = new Date().toISOString()
                 const nowMs = Date.now()
     
                 if(!RULESET.enabled_branch_names.includes(config.branch)) {
@@ -129,7 +129,7 @@ export async function gitHubWebhookHandler(
                             console.error('❌ Deploy script failed:', stderr)
                             deployments.update(newDeployment.id, {
                                 status: 'failed',
-                                end_at: new Date().toISOString(),
+                                end_at: formatDate(),
                                 execution_time: String(Date.now() - nowMs),
                             })
                             console.log('ERROR', err);
@@ -138,7 +138,7 @@ export async function gitHubWebhookHandler(
                         console.log('✅ Deploy successful:', stdout)
                         deployments.update(newDeployment.id, {
                             status: 'success',
-                            end_at: new Date().toISOString(),
+                            end_at: formatDate(),
                             execution_time: String(Date.now() - nowMs),
                         })
                         resolve(void 0)

@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3'
 import { randomUUID } from 'crypto'
+import { formatDate } from '../utils/datetime'
 
 export const DB_NAME = './deployments.sqlite'
 
@@ -64,7 +65,7 @@ export class DeploymentStore {
         const next = (row.maxn ?? 0) + 1
 
         const id = randomUUID()
-        const now = new Date().toISOString()
+        const now = formatDate()
         const stmt = this.db.prepare(`
             INSERT INTO deployments (
                 id, number, commit_name, commit_hash, branch,
