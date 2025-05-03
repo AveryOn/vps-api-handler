@@ -15,19 +15,17 @@ export function initTabelClient(tableValue: string, nonce: string) {
             table { 
                 border-collapse: collapse; 
                 width: 100%; 
-                table-layout: fixed;
-                width: 100%; 
             }
             th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
             th { background: #f0f0f0; }
             tr:nth-child(even) { background: #fafafa; }
             tr:hover { background: #f5f5f5; }
-            #td-commit-name {
-                width: 10%;
+            #td-number {
+                width: 60px !important;
             }
             /* зафиксировать макс. ширину столбца и включить ellipsis */
             #td-commit-name {
-                max-width: 150px;
+                max-width: 120px !important;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -55,7 +53,7 @@ export function initTabelClient(tableValue: string, nonce: string) {
             const body = document.querySelector('#tbl tbody')
             body.innerHTML = data.map(d => \`
                 <tr>
-                <td>\${d.number}</td>
+                <td id="td-number">\${d.number}</td>
                 <td id="td-commit-name">\${d.commit_name}</td>
                 <td>\${d.commit_hash}</td>
                 <td>\${d.branch}</td>
