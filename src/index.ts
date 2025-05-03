@@ -46,8 +46,13 @@ app.use(rateLimit({
   },
 }))
 
-// HTML-таблица с деплойами и авто-обновлением
+// до любых catch-all или статики
 app.get('/deployments', (req, res) => {
+  res.json(deployments.findAll())
+})
+
+// HTML-таблица с деплойами и авто-обновлением
+app.get('/deployments/history', (req, res) => {
   // 1) Генерим случайный nonce
   const nonce = randomBytes(16).toString('base64')
 
