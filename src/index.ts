@@ -70,7 +70,7 @@ app.get('/deployments/history', (req, res) => {
   const rows = deployments.findAll().map(d => `
     <tr>
       <td>${d.number}</td>
-      <td>${d.commit}</td>
+      <td>${d.commit_name}</td>
       <td>${d.commit_hash}</td>
       <td>${d.branch}</td>
       <td>${d.script}</td>

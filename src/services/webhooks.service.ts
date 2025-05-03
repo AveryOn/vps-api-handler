@@ -3,8 +3,16 @@ import type { GitHubPushEventPayload, GitHubWebhookHeaders } from "../types/webh
 import { verifySignatureGitHub } from "../utils/verify"
 import { exec } from "child_process"
 import moment from "moment"
+import { DeploymentStore } from "../db/store"
 
 type GitHubGuardResponse = { payload: GitHubPushEventPayload, event: string }
+type ENVIRONMENTS = 'DEV' | 'PROD' | 'LOCAL'
+interface ExecuteDeploymentScript {
+    script: string,
+    branch: string,
+    environment?: string | null,
+    namespace?: string | null,
+}
 /**
  * Защита контроллера для вебхука пришедшего с гитхаба
  * @param req - объект запроса express
@@ -67,25 +75,50 @@ export async function gitHubWebhookHandler(
              * ветка на которую был push
              */
             const branch = payload.ref.replace('refs/heads/', '')
-            const scripts = [
+            const configs = [
                 pushForSoundSphereEngRepo(branch)
             ]
 
             const formattedDate = moment(Date.now()).format('DD.MM.YYYY_HH-mm-ss')
+            const deployments = new DeploymentStore()
 
-            for (const script of scripts) {
+            for (const config of configs) {
+                const commitName = `deploy-${formattedDate}___SHA:${commitSha}`
                 // формируем команду, передаем SHA как аргумент
-                const cmd = `bash ${script} deploy-${formattedDate}___SHA:${commitSha}`
+                const cmd = `bash ${config.script} ${commitName}`
+                const now = new Date().toISOString()
+                const nowMs = Date.now()
     
                 console.log(`🚀 Starting deploy for commit ${commitSha}`)
     
                 await new Promise<void>((resolve, reject) => {
-                    exec(cmd, (err, stdout, stderr) => {
+                    const newDeployment = deployments.create({
+                        branch: config.branch,
+                        commit_name: commitName,
+                        commit_hash: commitSha,
+                        script: config.script,
+                        status: 'pending',
+                        end_at: null,
+                        environment: config.environment,
+                        execution_time: null,
+                        namespace: config.namespace,
+                    })
+                    exec(cmd, async (err, stdout, stderr) => {
                         if (err) {
                             console.error('❌ Deploy script failed:', stderr)
+                            deployments.update(newDeployment.id, {
+                                status: 'failed',
+                                end_at: now,
+                                execution_time: String(Date.now() - nowMs),
+                            })
                             return reject(err)
                         }
                         console.log('✅ Deploy successful:', stdout)
+                        deployments.update(newDeployment.id, {
+                            status: 'success',
+                            end_at: now,
+                            execution_time: String(Date.now() - nowMs),
+                        })
                         resolve(void 0)
                     })
                 })
@@ -99,14 +132,23 @@ export async function gitHubWebhookHandler(
 /**
  * Инкапсулирует логику вызова deploy скрипта для проекта sound-sphere-eng
  */
-function pushForSoundSphereEngRepo(branch: string): string {
+function pushForSoundSphereEngRepo(branch: string): ExecuteDeploymentScript {
     try {
+        const environments: Record<string, ENVIRONMENTS> = {
+            dev: 'DEV',
+            prod: 'PROD'
+        } as const
         // выбираем скрипт
         const scriptPath =
             branch === 'dev'
                 ? 'sound-sphere-eng-deploy-dev.sh'
                 : 'sound-sphere-eng-deploy-prod.sh'
-        return scriptPath
+        return {
+            script: scriptPath,
+            branch,
+            environment: environments[branch] ?? null,
+            namespace: 'sound-sphere-eng',
+        }
     } catch (err) {
         console.error(err)
         throw err

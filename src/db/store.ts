@@ -6,7 +6,7 @@ export const DB_NAME = './deployments.sqlite'
 export interface Deployment {
     id: string
     number: number
-    commit: string
+    commit_name: string
     commit_hash: string
     branch: string
     script: string
@@ -59,11 +59,11 @@ export class DeploymentStore {
         const now = new Date().toISOString()
         const stmt = this.db.prepare(`
             INSERT INTO deployments (
-                id, number, commit, commit_hash, branch,
+                id, number, commit_name, commit_hash, branch,
                 environment, script, execution_time,
                 namespace, status, end_at, created_at
             ) VALUES (
-                @id, @number, @commit, @commit_hash, @branch,
+                @id, @number, @commit_name, @commit_hash, @branch,
                 @environment, @script, @execution_time,
                 @namespace, @status, @end_at, @created_at
             )
@@ -71,7 +71,7 @@ export class DeploymentStore {
         stmt.run({
             id,
             number: next,
-            commit: dep.commit,
+            commit_name: dep.commit_name,
             commit_hash: dep.commit_hash,
             branch: dep.branch,
             environment: dep.environment ?? null,
