@@ -10,11 +10,12 @@ config()
 // DataBase
 import { runMigrations } from './db/migrator'
 import { DeploymentStore, DB_NAME } from './db/store'
+import { initTabelClient } from './statics/deployment-table'
 
 /* 
   INIT DataBase
 */
-const db = new DeploymentStore()
+const deployments = new DeploymentStore()
 runMigrations(DB_NAME)
 
 const app = express()
@@ -44,10 +45,26 @@ app.use(rateLimit({
   },
 }))
 
-// 5) Webhook GitHub
-app.get('/webhooks', express.raw({ type: '*/*' }), (req, res) => {
-  console.log('GitHub Event:', req.headers['x-github-event'])
-  res.status(200).send(req.headers)
+// HTML-таблица с деплойами и авто-обновлением
+app.get('/deployments/', (req, res) => {
+  const rows = deployments.findAll().map(d => `
+    <tr>
+      <td>${d.number}</td>
+      <td>${d.commit}</td>
+      <td>${d.commit_hash}</td>
+      <td>${d.branch}</td>
+      <td>${d.script}</td>
+      <td>${d.status}</td>
+      <td>${d.created_at}</td>
+      <td>${d.environment ?? ''}</td>
+      <td>${d.execution_time ?? ''}</td>
+      <td>${d.namespace ?? ''}</td>
+      <td>${d.end_at ?? ''}</td>
+    </tr>
+  `).join('')
+
+  const html = initTabelClient(rows)
+  res.send(html)
 })
 
 app.post(
