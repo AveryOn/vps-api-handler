@@ -39,6 +39,7 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
             <tr>
                 <th>#</th><th>Commit</th><th>Hash</th><th>Branch</th>
                 <th>Script</th><th>Status</th><th>Created At</th>
+                <th>Repo</th><
                 <th>Env</th><th>Exec Time</th><th>Namespace</th><th>End At</th>
             </tr>
             </thead>
