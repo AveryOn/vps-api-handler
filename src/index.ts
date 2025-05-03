@@ -3,8 +3,6 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import { config } from 'dotenv'
-import { verifySignatureGitHub } from './utils/verify'
-import { GitHubPushEventPayload, GitHubWebhookHeaders } from './types/webhooks.types'
 import { gitHubWebhookControllerGuard, gitHubWebhookHandler } from './services/webhooks.service'
 config()
 

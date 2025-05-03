@@ -2,6 +2,7 @@ import type { Request, Response } from "express"
 import type { GitHubPushEventPayload, GitHubWebhookHeaders } from "../types/webhooks.types"
 import { verifySignatureGitHub } from "../utils/verify"
 import { exec } from "child_process"
+import moment from "moment"
 
 type GitHubGuardResponse = { payload: GitHubPushEventPayload, event: string }
 /**
@@ -66,30 +67,28 @@ export async function gitHubWebhookHandler(
         // выбираем скрипт
         const scriptPath =
             branch === 'dev'
-                ? '/root/projects/sound-sphere-eng/deploy-dev.sh'
-                : '/root/projects/sound-sphere-eng/deploy-prod.sh'
+                ? 'sound-sphere-eng-deploy-dev.sh'
+                : 'sound-sphere-eng-deploy-prod.sh'
 
 
-        console.log('[SCRIPT-SELECT] => ', scriptPath)
+        // абсолютный путь до твоего скрипта на VPS
 
-        // // абсолютный путь до твоего скрипта на VPS
-        // const scriptPath = '/root/projects/sound-sphere-eng/deploy-dev.sh'
+        const formattedDate = moment(Date.now()).format('DD.MM.YYYY_HH-mm-ss')
+        // формируем команду, передаем SHA как аргумент
+        const cmd = `bash ${scriptPath} deploy-${formattedDate}___SHA:${commitSha}`
 
-        // // формируем команду, передаем SHA как аргумент
-        // const cmd = `bash ${scriptPath} ${commitSha}`
+        console.log(`🚀 Starting deploy for commit ${commitSha}`)
 
-        // console.log(`🚀 Starting deploy for commit ${commitSha}`)
-
-        // await new Promise<void>((resolve, reject) => {
-        //     exec(cmd, (err, stdout, stderr) => {
-        //         if (err) {
-        //             console.error('❌ Deploy script failed:', stderr)
-        //             return reject(err)
-        //         }
-        //         console.log('✅ Deploy successful:', stdout)
-        //         resolve()
-        //     })
-        // })
+        await new Promise<void>((resolve, reject) => {
+            exec(cmd, (err, stdout, stderr) => {
+                if (err) {
+                    console.error('❌ Deploy script failed:', stderr)
+                    return reject(err)
+                }
+                console.log('✅ Deploy successful:', stdout)
+                resolve(void 0)
+            })
+        })
 
 
     } catch (err) {
