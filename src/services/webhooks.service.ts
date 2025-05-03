@@ -129,7 +129,7 @@ export async function gitHubWebhookHandler(
                             console.error('❌ Deploy script failed:', stderr)
                             deployments.update(newDeployment.id, {
                                 status: 'failed',
-                                end_at: now,
+                                end_at: new Date().toISOString(),
                                 execution_time: String(Date.now() - nowMs),
                             })
                             return reject(err)
@@ -137,7 +137,7 @@ export async function gitHubWebhookHandler(
                         console.log('✅ Deploy successful:', stdout)
                         deployments.update(newDeployment.id, {
                             status: 'success',
-                            end_at: now,
+                            end_at: new Date().toISOString(),
                             execution_time: String(Date.now() - nowMs),
                         })
                         resolve(void 0)
