@@ -132,6 +132,7 @@ export async function gitHubWebhookHandler(
                                 end_at: new Date().toISOString(),
                                 execution_time: String(Date.now() - nowMs),
                             })
+                            console.log('ERROR', err);
                             return reject(err)
                         }
                         console.log('✅ Deploy successful:', stdout)
