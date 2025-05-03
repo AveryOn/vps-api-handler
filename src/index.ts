@@ -3,8 +3,9 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import { config } from 'dotenv'
-import { verifySignature } from './utils/verify'
-import { GitHubWebhookHeaders } from './types/webhooks.types'
+import { verifySignatureGitHub } from './utils/verify'
+import { GitHubPushEventPayload, GitHubWebhookHeaders } from './types/webhooks.types'
+import { gitHubWebhookControllerGuard, gitHubWebhookHandler } from './services/webhooks.service'
 config()
 
 const app = express()
@@ -44,32 +45,13 @@ app.post(
     '/webhooks',
     express.raw({ type: 'application/json' }),
     async (req: Request, res) => {
-      const headers = req.headers as GitHubWebhookHeaders
-      const secret = process.env.WEBHOOKS_SECRET!
-      const signature = headers['x-hub-signature-256']
+      
+      // Если вебхук пришел с гитхаба
+      if(req.headers['user-agent'].toLocaleLowerCase().includes('github')) {
+        const body = await gitHubWebhookControllerGuard(req)
+        gitHubWebhookHandler(body)
+      }
 
-      if (!signature) {
-        res.status(400).send('Missing X-Hub-Signature-256 header')
-        throw 400
-      }
-  
-      const payload = req.body.toString()   // строка JSON
-  
-      let valid = false
-      try {
-        valid = await verifySignature(secret, signature as string, payload)
-      } catch (err) {
-        console.error('Error verifying signature:', err)
-        throw 400
-      }
-      if (!valid) {
-        res.status(401).send('Unauthorized')
-        throw 401
-      }
-  
-      // здесь уже безопасно обрабатывать вебхук
-      console.log('✅ Verified GitHub event:', req.headers['x-github-event'])
-      console.debug('BODY', JSON.parse(req.body.toString('utf-8')));
       
       res.status(200).send('OK')
     }

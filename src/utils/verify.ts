@@ -8,7 +8,7 @@ let encoder = new TextEncoder();
  * @param payload – сырое тело запроса в виде строки (JSON).
  * @returns Promise<boolean> – true, если подпись совпадает, иначе false.
  */
-export async function verifySignature(secret: string, header: string, payload: string) {
+export async function verifySignatureGitHub(secret: string, header: string, payload: string) {
     let parts = header.split("=");
     let sigHex = parts[1];
 
