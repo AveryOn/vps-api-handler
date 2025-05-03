@@ -60,6 +60,7 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
                 <td>\${d.script}</td>
                 <td>\${d.status}</td>
                 <td>\${d.created_at}</td>
+                <td>\${d.repo||''}</td>
                 <td>\${d.environment||''}</td>
                 <td>\${d.execution_time||''}</td>
                 <td>\${d.namespace||''}</td>
