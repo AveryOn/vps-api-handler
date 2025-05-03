@@ -9,7 +9,7 @@ export function initTabelClient(tableValue: string, nonce: string) {
         <html lang="ru">
         <head>
         <meta charset="UTF-8">
-        <title>История деплоев</title>
+        <title>▶Deployment History</title>
         <style nonce="${nonce}">
             body { font-family: sans-serif; padding: 20px; }
             table { 
@@ -33,7 +33,7 @@ export function initTabelClient(tableValue: string, nonce: string) {
         </style>
         </head>
         <body>
-        <h1>История деплоев</h1>
+        <h1>▶Deployment History</h1>
         <table id="tbl">
             <thead>
             <tr>
