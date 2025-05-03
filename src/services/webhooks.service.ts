@@ -136,7 +136,7 @@ function pushForSoundSphereEngRepo(branch: string): ExecuteDeploymentScript {
     try {
         const environments: Record<string, ENVIRONMENTS> = {
             dev: 'DEV',
-            prod: 'PROD'
+            main: 'PROD'
         } as const
         // выбираем скрипт
         const scriptPath =
