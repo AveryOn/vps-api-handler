@@ -1,5 +1,13 @@
 let encoder = new TextEncoder();
 
+/**
+ * Проверяет HMAC-SHA256 подпись для GitHub webhook.
+ *
+ * @param secret – ваш общий секрет из настроек вебхука.
+ * @param header – значение заголовка "x-hub-signature-256" вида "sha256=...".
+ * @param payload – сырое тело запроса в виде строки (JSON).
+ * @returns Promise<boolean> – true, если подпись совпадает, иначе false.
+ */
 export async function verifySignature(secret: string, header: string, payload: string) {
     let parts = header.split("=");
     let sigHex = parts[1];
@@ -28,6 +36,13 @@ export async function verifySignature(secret: string, header: string, payload: s
     return equal;
 }
 
+
+/**
+ * Преобразует строку в шестнадцатеричном формате в Uint8Array.
+ *
+ * @param hex – строка, каждый два символа которой представляют один байт.
+ * @returns Uint8Array – массив байт, соответствующий hex-строке.
+ */
 function hexToBytes(hex: string) {
     let len = hex.length / 2;
     let bytes = new Uint8Array(len);
