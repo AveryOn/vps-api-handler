@@ -148,11 +148,11 @@ app.get('/deployments/history', (req, res) => {
       <td>${d.script}</td>
       <td>${d.status}</td>
       <td>${d.created_at}</td>
-      <td>${d.repo||''}</td>
-      <td>${d.environment||''}</td>
-      <td>${d.execution_time||''}</td>
-      <td>${d.namespace||''}</td>
-      <td>${d.end_at||''}</td>
+      <td>${d.repo||'-'}</td>
+      <td>${d.environment||'-'}</td>
+      <td>${d.execution_time||'-'}</td>
+      <td>${d.namespace||'-'}</td>
+      <td>${d.end_at||'-'}</td>
     </tr>
   `).join('')
 
@@ -192,11 +192,11 @@ app.get('/deployments/history/:commit_hash', (req, res) => {
       <td>${d.script}</td>
       <td>${d.status}</td>
       <td>${d.created_at}</td>
-      <td>${d.repo||''}</td>
-      <td>${d.environment||''}</td>
-      <td>${d.execution_time||''}</td>
-      <td>${d.namespace||''}</td>
-      <td>${d.end_at||''}</td>
+      <td>${d.repo||'-'}</td>
+      <td>${d.environment||'-'}</td>
+      <td>${d.execution_time||'-'}</td>
+      <td>${d.namespace||'-'}</td>
+      <td>${d.end_at||'-'}</td>
     </tr>
   `).join('')
 
