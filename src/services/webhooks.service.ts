@@ -56,41 +56,41 @@ export async function gitHubWebhookHandler(
     payload: GitHubPushEventPayload,
     event: string
 ): Promise<void> {
-    if (!payload?.repository) throw 401
+    if (!payload?.repository || !event) throw 401
     try {
-        // берем коммит, по которому будем деплоить
-        const commitSha = payload.head_commit?.id
-        if (!commitSha) throw 400
-
-        // узнаём, куда правим: dev или main
-        const branch = payload.ref.replace('refs/heads/', '')
-        // выбираем скрипт
-        const scriptPath =
-            branch === 'dev'
-                ? 'sound-sphere-eng-deploy-dev.sh'
-                : 'sound-sphere-eng-deploy-prod.sh'
-
-
-        // абсолютный путь до твоего скрипта на VPS
-
-        const formattedDate = moment(Date.now()).format('DD.MM.YYYY_HH-mm-ss')
-        // формируем команду, передаем SHA как аргумент
-        const cmd = `bash ${scriptPath} deploy-${formattedDate}___SHA:${commitSha}`
-
-        console.log(`🚀 Starting deploy for commit ${commitSha}`)
-
-        await new Promise<void>((resolve, reject) => {
-            exec(cmd, (err, stdout, stderr) => {
-                if (err) {
-                    console.error('❌ Deploy script failed:', stderr)
-                    return reject(err)
-                }
-                console.log('✅ Deploy successful:', stdout)
-                resolve(void 0)
+        if(event?.toLocaleLowerCase() === 'push') {
+            // берем коммит, по которому будем деплоить
+            const commitSha = payload.head_commit?.id
+            if (!commitSha) throw 400
+    
+            // узнаём, куда правим: dev или main
+            const branch = payload.ref.replace('refs/heads/', '')
+            // выбираем скрипт
+            const scriptPath =
+                branch === 'dev'
+                    ? 'sound-sphere-eng-deploy-dev.sh'
+                    : 'sound-sphere-eng-deploy-prod.sh'
+    
+    
+            // абсолютный путь до твоего скрипта на VPS
+    
+            const formattedDate = moment(Date.now()).format('DD.MM.YYYY_HH-mm-ss')
+            // формируем команду, передаем SHA как аргумент
+            const cmd = `bash ${scriptPath} deploy-${formattedDate}___SHA:${commitSha}`
+    
+            console.log(`🚀 Starting deploy for commit ${commitSha}`)
+    
+            await new Promise<void>((resolve, reject) => {
+                exec(cmd, (err, stdout, stderr) => {
+                    if (err) {
+                        console.error('❌ Deploy script failed:', stderr)
+                        return reject(err)
+                    }
+                    console.log('✅ Deploy successful:', stdout)
+                    resolve(void 0)
+                })
             })
-        })
-
-
+        }
     } catch (err) {
         throw 401
     }
