@@ -1,10 +1,21 @@
 import express, { type Request } from 'express'
+import './const/global'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
 import { config } from 'dotenv'
 import { gitHubWebhookControllerGuard, gitHubWebhookHandler } from './services/webhooks.service'
 config()
+
+// DataBase
+import { runMigrations } from './db/migrator'
+import { DeploymentStore, DB_NAME } from './db/store'
+
+/* 
+  INIT DataBase
+*/
+const db = new DeploymentStore()
+runMigrations(DB_NAME)
 
 const app = express()
 const PORT = process.env.PORT ?? 4000

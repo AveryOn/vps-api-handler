@@ -1,6 +1,8 @@
 import Database from 'better-sqlite3'
 import { randomUUID } from 'crypto'
 
+export const DB_NAME = './deployments.sqlite'
+
 export interface Deployment {
     id: string
     number: number
@@ -30,7 +32,7 @@ export class DeploymentStore {
             CREATE TABLE IF NOT EXISTS deployments (
                 id TEXT PRIMARY KEY,
                 number INTEGER NOT NULL,
-                commit TEXT NOT NULL,
+                commit_name TEXT NOT NULL,
                 commit_hash TEXT NOT NULL,
                 branch TEXT NOT NULL,
                 environment TEXT,
