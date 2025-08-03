@@ -145,7 +145,7 @@ export async function gitHubWebhookHandler(
                     })
                     const proc = spawn(`${config.script} ${commitName}`, [], { shell: true });
                     proc.stdout.on('data', (data) => {
-                        process.stdout.write(`[stdout] ${data}`);
+                        process.stdout.write(`[stdout] LALALALLA`);
                         console.log("LALALALLA");
                     });
                     // exec(cmd, { maxBuffer: 1024 * 1024 }, async (err, stdout, stderr) => {
