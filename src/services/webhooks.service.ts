@@ -163,7 +163,7 @@ export async function gitHubWebhookHandler(
                             end_at: formatDate(),
                             execution_time: String(Date.now() - nowMs),
                         })
-                        exec(`echo "pm2 restarting..." && bash pm2 restart ${ServiceNamesByProject[payload?.repository?.name]}`)
+                        exec(`bash -lc 'source ~/.nvm/nvm.sh && pm2 reload ${ServiceNamesByProject[payload?.repository?.name]}`)
                         resolve(void 0);
                     })
                 })
