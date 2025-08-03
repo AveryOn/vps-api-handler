@@ -166,8 +166,8 @@ export async function gitHubWebhookHandler(
                         resolve(void 0)
                     })
                 })
-                console.debug('pm2 restarting...')
-                exec(`bash -lc 'source ~/.nvm/nvm.sh && pm2 reload ${ServiceNamesByProject[payload?.repository?.name]}`)
+                console.log('pm2 restarting...')
+                // exec(`bash -lc 'source ~/.nvm/nvm.sh && pm2 reload ${ServiceNamesByProject[payload?.repository?.name]}`)
             }
         }
     } catch (err) {
