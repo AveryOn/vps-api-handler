@@ -103,7 +103,7 @@ export async function gitHubWebhookHandler(
                 const commitName = `deploy-${formattedDate}___SHA:${commitSha}`
                 // формируем команду, передаем SHA как аргумент
                 // const cmd = `bash ${config.script} ${commitName}`
-                const cmd = `bash echo "${config.script}"`
+                const cmd = `echo "${config.script}"`
                 const nowMs = Date.now()
     
                 if(!RULESET.enabled_branch_names.includes(config.branch as any)) {
