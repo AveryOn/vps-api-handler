@@ -1,7 +1,7 @@
 import type { Request, Response } from "express"
 import type { GitHubPushEventPayload, GitHubWebhookHeaders, GitHubRepository, GitHubGuardResponse, ExecuteDeploymentScript, ENVIRONMENTS } from "../types/webhooks.types"
 import { verifySignatureGitHub } from "../utils/verify"
-import { exec, spawn } from "child_process"
+import { exec } from "child_process"
 import moment from "moment"
 import { DeploymentStore } from "../db/store"
 import { formatDate } from "../utils/datetime"
@@ -143,30 +143,25 @@ export async function gitHubWebhookHandler(
                         namespace: config.namespace,
                         side: config.side,
                     })
-                    const proc = spawn(`${config.script} ${commitName}`, [], { shell: true });
-                    proc.stdout.on('data', (data) => {
-                        process.stdout.write(`[stdout] LALALALLA`);
-                        console.log("LALALALLA");
-                    });
-                    // exec(cmd, { maxBuffer: 1024 * 1024 }, async (err, stdout, stderr) => {
-                    //     if (err) {
-                    //         console.error('[03] Error', stderr)
-                    //         deployments.update(newDeployment.id, {
-                    //             status: 'failed',
-                    //             end_at: formatDate(),
-                    //             execution_time: String(Date.now() - nowMs),
-                    //         })
-                    //         console.log('[03-1] Error', err);
-                    //         return reject(err)
-                    //     }
-                    //     console.log('✅ Deploy successful:', stdout)
-                    //     deployments.update(newDeployment.id, {
-                    //         status: 'success',
-                    //         end_at: formatDate(),
-                    //         execution_time: String(Date.now() - nowMs),
-                    //     })
-                    //     resolve(void 0);
-                    // })
+                    exec(cmd, { maxBuffer: 1024 * 1024 }, async (err, stdout, stderr) => {
+                        if (err) {
+                            console.error('[03] Error', stderr)
+                            deployments.update(newDeployment.id, {
+                                status: 'failed',
+                                end_at: formatDate(),
+                                execution_time: String(Date.now() - nowMs),
+                            })
+                            console.log('[03-1] Error', err);
+                            return reject(err)
+                        }
+                        console.log('✅ Deploy successful:', stdout)
+                        deployments.update(newDeployment.id, {
+                            status: 'success',
+                            end_at: formatDate(),
+                            execution_time: String(Date.now() - nowMs),
+                        })
+                        resolve(void 0);
+                    })
                 })
             }
         }
