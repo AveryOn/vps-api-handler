@@ -143,7 +143,7 @@ export async function gitHubWebhookHandler(
                         namespace: config.namespace,
                         side: config.side,
                     })
-                    exec(cmd, async (err, stdout, stderr) => {
+                    exec(cmd, { maxBuffer: 1024 * 1024 }, async (err, stdout, stderr) => {
                         if (err) {
                             console.error('[03] Error', stderr)
                             deployments.update(newDeployment.id, {
