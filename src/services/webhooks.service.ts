@@ -183,7 +183,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
             production: 'PROD',
             main: 'PROD',
             master: 'PROD',
-        } as const
+        } as const;
 
         const envBranches: Partial<Record<ENVIRONMENTS, typeof RULESET.enabled_branch_names[number][]>> = {
             DEV: ['dev', 'develop'],
