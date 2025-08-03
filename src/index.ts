@@ -36,7 +36,7 @@ routes.forEach((route) => {
   app.use(route.path, route.router)
 })
 app.use(express.json())
-console.debug('HELLO WORLD')
+console.debug('HELLO WORLD 123')
 
 app.listen(PORT, () => {
   console.log(`🚀 Server listening on http://0.0.0.0:${PORT}`)
