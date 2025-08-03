@@ -177,7 +177,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
 
         // Опеределяем какой репозиторий обновили клиентский или серверный
         if (repoName.includes('client') || repoName.includes('front')) {
-            side = 'client'
+            side = 'client';
         }
         else if (repoName.includes('api') || repoName.includes('server') || repoName.includes('backend')) {
             side = 'server';
