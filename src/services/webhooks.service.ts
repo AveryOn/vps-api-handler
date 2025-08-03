@@ -54,7 +54,7 @@ export async function gitHubWebhookControllerGuard(req: Request): Promise<GitHub
         const signature = headers['x-hub-signature-256']
 
         if (!signature) {
-            console.error('[09] Error')
+            console.error('[09] Error');
             throw 401
         }
 
