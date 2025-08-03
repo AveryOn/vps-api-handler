@@ -223,7 +223,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
             side: side,
         }
     } catch (err) {
-        console.error('[010] Error', err)
+        console.error('[010] Error', err);
         throw err;
     }
 }
