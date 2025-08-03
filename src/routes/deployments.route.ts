@@ -147,6 +147,6 @@ router.get('/history/:commit_hash', (req, res) => {
 })
 
 export default {
-    path: 'deployments',
+    path: '/deployments',
     router,
 } as const;

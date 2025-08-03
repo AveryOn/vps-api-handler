@@ -29,6 +29,6 @@ router.post(
 )
 
 export default {
-    path: 'webhooks',
+    path: '/webhooks',
     router,
-} as const;;
+} as const;
