@@ -172,7 +172,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
                 : 'echo "prod';
 
         let side: ExecuteDeploymentScript['side'] = null
-        const repoName = repository.full_name.toLowerCase()
+        const repoName = repository.full_name.toLowerCase();
 
         // Опеределяем какой репозиторий обновили клиентский или серверный
         if (repoName.includes('client') || repoName.includes('front')) {
