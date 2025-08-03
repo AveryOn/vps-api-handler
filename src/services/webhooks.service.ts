@@ -166,7 +166,7 @@ export async function gitHubWebhookHandler(
             }
         }
     } catch (err) {
-        console.error('[04] Error', err);
+        console.error('[04] Error', err)
         throw 401;
     }
 }
