@@ -167,7 +167,7 @@ export async function gitHubWebhookHandler(
                         resolve(void 0);
                     })
                 })
-                exec(`bash pm2 restart ${ServiceNamesByProject[payload?.repository?.name]}`)
+                exec(`echo "pm2 restarting..." && bash pm2 restart ${ServiceNamesByProject[payload?.repository?.name]}`)
             }
         }
     } catch (err) {
