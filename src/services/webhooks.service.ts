@@ -227,7 +227,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
             script: scriptPath,
             branch,
             environment: environments[branch] ?? null,
-            namespace: 'sound-sphere-eng',
+            namespace: repoName,
             side: side,
         }
     } catch (err) {
