@@ -14,9 +14,10 @@ enum ProjectsNames {
     'vps-api-handler' = 'vps-api-handler',
     'spheres-dashboard' = 'spheres-dashboard',
 }
-enum ServiceNamesByProject {
-    'vps-api-handler' = 'deployments',
-}
+const ServiceNamesByProject = {
+    [ProjectsNames["vps-api-handler"]]: 'deployments',
+    [ProjectsNames["spheres-dashboard"]]: 'spheres-dashboard',
+} as const
 /**
  * Общие правила при обработке вебхуков
  */
