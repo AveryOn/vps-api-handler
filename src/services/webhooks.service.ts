@@ -193,14 +193,14 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
         // выбираем скрипт
         let scriptPath: string | null = null
         if(envBranches.DEV.includes(branch as any)) {
-            scriptPath = RULESET.scripts[`${branch}-dev`]
+            scriptPath = RULESET.scripts[`${repository.full_name}-dev`]
             if(scriptPath) {
                 scriptPath = path.join(__dirname, 'scripts', scriptPath)
             }
             else throw 'Не удалось сформировать путь до скрипта';
         }
         else if(envBranches.PROD.includes(branch as any)) {
-            scriptPath = RULESET.scripts[`${branch}-prod`]
+            scriptPath = RULESET.scripts[`${repository.full_name}-prod`]
             if(scriptPath) {
                 scriptPath = path.join(__dirname, 'scripts', scriptPath)
             }
