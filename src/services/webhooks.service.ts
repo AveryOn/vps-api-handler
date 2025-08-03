@@ -165,7 +165,7 @@ export async function gitHubWebhookHandler(
                             end_at: formatDate(),
                             execution_time: String(Date.now() - nowMs),
                         })
-                        resolve(void 0)
+                        resolve(void 0);
                     })
                 })
             }
