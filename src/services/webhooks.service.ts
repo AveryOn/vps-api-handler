@@ -14,6 +14,9 @@ enum ProjectsNames {
     'vps-api-handler' = 'vps-api-handler',
     'spheres-dashboard' = 'spheres-dashboard',
 }
+enum ServiceNamesByProject {
+    'vps-api-handler' = 'deployments',
+}
 /**
  * Общие правила при обработке вебхуков
  */
@@ -160,9 +163,11 @@ export async function gitHubWebhookHandler(
                             end_at: formatDate(),
                             execution_time: String(Date.now() - nowMs),
                         })
+
                         resolve(void 0);
                     })
                 })
+                exec(`bash pm2 restart ${ServiceNamesByProject[payload?.repository?.name]}`)
             }
         }
     } catch (err) {
