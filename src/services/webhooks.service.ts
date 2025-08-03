@@ -176,7 +176,6 @@ export async function gitHubWebhookHandler(
  */
 function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository): ExecuteDeploymentScript {
     try {
-        console.debug(repository);
         const environments: Partial<Record<typeof RULESET.enabled_branch_names[number], ENVIRONMENTS>> = {
             dev: 'DEV',
             develop: 'DEV',
@@ -193,23 +192,23 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
         // выбираем скрипт
         let scriptPath: string | null = null
         if(envBranches.DEV.includes(branch as any)) {
-            scriptPath = RULESET.scripts[`${repository.full_name}-dev`]
-            console.debug('KEY-NAME', `${repository.full_name}-dev`)
+            scriptPath = RULESET.scripts[`${repository.name}-dev`]
+            console.debug('KEY-NAME', `${repository.name}-dev`)
             if(scriptPath) {
                 scriptPath = path.join(__dirname, 'scripts', scriptPath)
             }
             else throw 'Не удалось сформировать путь до скрипта';
         }
         else if(envBranches.PROD.includes(branch as any)) {
-            scriptPath = RULESET.scripts[`${repository.full_name}-prod`]
-            console.debug('KEY-NAME', `${repository.full_name}-prod`)
+            scriptPath = RULESET.scripts[`${repository.name}-prod`]
+            console.debug('KEY-NAME', `${repository.name}-prod`)
             if(scriptPath) {
                 scriptPath = path.join(__dirname, 'scripts', scriptPath)
             }
             else throw 'Не удалось сформировать путь до скрипта'
         }
         let side: ExecuteDeploymentScript['side'] = null
-        const repoName = repository.full_name.toLowerCase();
+        const repoName = repository.name.toLowerCase();
 
         // Опеределяем какой репозиторий обновили клиентский или серверный
         if (repoName.includes('client') || repoName.includes('front')) {
