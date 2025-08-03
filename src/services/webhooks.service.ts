@@ -158,7 +158,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
         const scriptPath =
             branch === 'dev'
                 ? 'echo "dev"'
-                : 'echo "prod'
+                : 'echo "prod';
 
         let side: ExecuteDeploymentScript['side'] = null
         const repoName = repository.full_name.toLowerCase()
