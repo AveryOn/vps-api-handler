@@ -193,6 +193,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
         let scriptPath: string | null = null
         if(envBranches.DEV.includes(branch as any)) {
             scriptPath = RULESET.scripts[`${repository.full_name}-dev`]
+            console.debug('KEY-NAME', `${repository.full_name}-dev`)
             if(scriptPath) {
                 scriptPath = path.join(__dirname, 'scripts', scriptPath)
             }
@@ -200,6 +201,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
         }
         else if(envBranches.PROD.includes(branch as any)) {
             scriptPath = RULESET.scripts[`${repository.full_name}-prod`]
+            console.debug('KEY-NAME', `${repository.full_name}-prod`)
             if(scriptPath) {
                 scriptPath = path.join(__dirname, 'scripts', scriptPath)
             }
