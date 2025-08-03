@@ -39,7 +39,7 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
             <tr>
                 <th>#</th><th>Commit</th><th>Hash</th><th>Branch</th>
                 <th>Script</th><th>Status</th><th>Created At</th>
-                <th>Repo</th><
+                <th>Side</th><
                 <th>Env</th><th>Exec Time</th><th>Namespace</th><th>End At</th>
             </tr>
             </thead>
@@ -61,7 +61,7 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
                 <td>\${d.script}</td>
                 <td>\${d.status}</td>
                 <td>\${d.created_at}</td>
-                <td>\${d.repo||'-'}</td>
+                <td>\${d.side||'-'}</td>
                 <td>\${d.environment||'-'}</td>
                 <td>\${d.execution_time||'-'}</td>
                 <td>\${d.namespace||'-'}</td>

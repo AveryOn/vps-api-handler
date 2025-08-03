@@ -216,3 +216,14 @@ export interface GitHubPushEventPayload {
     commits: GitHubCommit[]
     head_commit: GitHubCommit
 }
+
+
+export type GitHubGuardResponse = { payload: GitHubPushEventPayload, event: string }
+export type ENVIRONMENTS = 'DEV' | 'PROD' | 'LOCAL'
+export interface ExecuteDeploymentScript {
+    script: string,
+    branch: string,
+    environment?: string | null,
+    namespace?: string | null,
+    side?: 'server' | 'client' | null,
+}

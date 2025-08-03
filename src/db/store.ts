@@ -14,7 +14,7 @@ export interface Deployment {
     status: string          // pending | success | failed
     created_at: string      // ISO
     // опционально:
-    repo?: string
+    side?: string
     environment?: string
     execution_time?: string // ISO
     namespace?: string
@@ -31,22 +31,23 @@ export class DeploymentStore {
 
     private init() {
         this.db.exec(`
-            CREATE TABLE IF NOT EXISTS deployments (
-                id TEXT PRIMARY KEY,
-                number INTEGER NOT NULL,
-                commit_name TEXT NOT NULL,
-                commit_hash TEXT NOT NULL,
-                branch TEXT NOT NULL,
-                environment TEXT,
-                script TEXT NOT NULL,
-                execution_time TEXT,
-                namespace TEXT,
-                status TEXT NOT NULL,
-                end_at TEXT,
-                created_at TEXT NOT NULL
-            );
-        `
-    )
+                CREATE TABLE IF NOT EXISTS deployments (
+                    id TEXT PRIMARY KEY,
+                    number INTEGER NOT NULL,
+                    commit_name TEXT NOT NULL,
+                    commit_hash TEXT NOT NULL,
+                    branch TEXT NOT NULL,
+                    environment TEXT,
+                    script TEXT NOT NULL,
+                    execution_time TEXT,
+                    namespace TEXT,
+                    status TEXT NOT NULL,
+                    end_at TEXT,
+                    created_at TEXT NOT NULL,
+                    side TEXT
+                );
+            `
+        )
     }
 
     /** Добавляет новый деплой и возвращает его */
@@ -71,11 +72,11 @@ export class DeploymentStore {
             INSERT INTO deployments (
                 id, number, commit_name, commit_hash, branch,
                 environment, script, execution_time,
-                namespace, status, end_at, created_at, repo
+                namespace, status, end_at, created_at, side
             ) VALUES (
                 @id, @number, @commit_name, @commit_hash, @branch,
                 @environment, @script, @execution_time,
-                @namespace, @status, @end_at, @created_at, @repo
+                @namespace, @status, @end_at, @created_at, @side
             )
         `)
         stmt.run({
@@ -91,7 +92,7 @@ export class DeploymentStore {
             status: dep.status,
             end_at: dep.end_at ?? null,
             created_at: now,
-            repo: dep.repo,
+            side: dep.side,
         })
 
         return {

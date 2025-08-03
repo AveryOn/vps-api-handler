@@ -1,20 +1,11 @@
 import type { Request, Response } from "express"
-import type { GitHubPushEventPayload, GitHubWebhookHeaders, GitHubRepository } from "../types/webhooks.types"
+import type { GitHubPushEventPayload, GitHubWebhookHeaders, GitHubRepository, GitHubGuardResponse, ExecuteDeploymentScript, ENVIRONMENTS } from "../types/webhooks.types"
 import { verifySignatureGitHub } from "../utils/verify"
 import { exec } from "child_process"
 import moment from "moment"
 import { DeploymentStore } from "../db/store"
 import { formatDate } from "../utils/datetime"
 
-type GitHubGuardResponse = { payload: GitHubPushEventPayload, event: string }
-type ENVIRONMENTS = 'DEV' | 'PROD' | 'LOCAL'
-interface ExecuteDeploymentScript {
-    script: string,
-    branch: string,
-    environment?: string | null,
-    namespace?: string | null,
-    repo?: string | null,
-}
 /**
  * Общие правила при обработке вебхуков
  */
@@ -29,7 +20,7 @@ const RULESET = {
         'develop',
         'prod',
         'production',
-    ] as string[]
+    ] as const
 } as const
 
 /**
@@ -47,7 +38,7 @@ export async function gitHubWebhookControllerGuard(req: Request): Promise<GitHub
             throw 401
         }
 
-        const payload = req.body.toString()   // строка JSON
+        const payload = req.body.toString()
 
         let valid = false
         try {
@@ -60,7 +51,6 @@ export async function gitHubWebhookControllerGuard(req: Request): Promise<GitHub
             throw 401
         }
 
-        // здесь уже безопасно обрабатывать вебхук
         console.log('✅ Verified GitHub event:', req.headers['x-github-event'])
         const body: GitHubPushEventPayload = JSON.parse(req.body.toString('utf-8'))
         if (!body) {
@@ -85,14 +75,12 @@ export async function gitHubWebhookHandler(
 ): Promise<void> {
     if (!payload?.repository || !event) throw 401
     try {
-        if (event?.toLocaleLowerCase() === 'push') {
+        if (event?.toLowerCase() === 'push') {
             // берем коммит, по которому будем деплоить
             const commitSha = payload.head_commit?.id
             if (!commitSha) throw 400
 
-            /**
-             * ветка на которую был push
-             */
+            /** ветка на которую был push */
             const branch = payload.ref.replace('refs/heads/', '')
             const configs = [
                 pushForSoundSphereEngRepo(branch, payload?.repository)
@@ -107,7 +95,7 @@ export async function gitHubWebhookHandler(
                 const cmd = `bash ${config.script} ${commitName}`
                 const nowMs = Date.now()
     
-                if(!RULESET.enabled_branch_names.includes(config.branch)) {
+                if(!RULESET.enabled_branch_names.includes(config.branch as any)) {
                     return void 0
                 }
 
@@ -124,7 +112,7 @@ export async function gitHubWebhookHandler(
                         environment: config.environment,
                         execution_time: null,
                         namespace: config.namespace,
-                        repo: config.repo,
+                        side: config.side,
                     })
                     exec(cmd, async (err, stdout, stderr) => {
                         if (err) {
@@ -158,31 +146,36 @@ export async function gitHubWebhookHandler(
  */
 function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository): ExecuteDeploymentScript {
     try {
-        const environments: Record<string, ENVIRONMENTS> = {
+        const environments: Partial<Record<typeof RULESET.enabled_branch_names[number], ENVIRONMENTS>> = {
             dev: 'DEV',
-            main: 'PROD'
+            develop: 'DEV',
+            prod: 'PROD',
+            production: 'PROD',
+            main: 'PROD',
+            master: 'PROD',
         } as const
         // выбираем скрипт
         const scriptPath =
             branch === 'dev'
-                ? 'sound-sphere-eng-deploy-dev.sh'
-                : 'sound-sphere-eng-deploy-prod.sh'
+                ? 'echo "dev"'
+                : 'echo "prod'
 
-        let repo = null
+        let side: ExecuteDeploymentScript['side'] = null
+        const repoName = repository.full_name.toLowerCase()
 
         // Опеределяем какой репозиторий обновили клиентский или серверный
-        if (repository.full_name.includes('client')) {
-            repo = 'client'
+        if (repoName.includes('client') || repoName.includes('front')) {
+            side = 'client'
         }
-        if (repository.full_name.includes('api') || repository.full_name.includes('server')) {
-            repo = 'server'
+        else if (repoName.includes('api') || repoName.includes('server') || repoName.includes('backend')) {
+            side = 'server'
         }
         return {
             script: scriptPath,
             branch,
             environment: environments[branch] ?? null,
             namespace: 'sound-sphere-eng',
-            repo: repo,
+            side: side,
         }
     } catch (err) {
         console.error(err)
