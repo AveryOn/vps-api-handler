@@ -188,7 +188,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
         const envBranches: Partial<Record<ENVIRONMENTS, typeof RULESET.enabled_branch_names[number][]>> = {
             DEV: ['dev', 'develop'],
             PROD: ['main', 'master', 'prod', 'production']
-        } as const
+        } as const;
         // выбираем скрипт
         let scriptPath: string | null = null
         if(envBranches.DEV.includes(branch as any)) {
