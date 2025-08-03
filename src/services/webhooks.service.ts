@@ -179,7 +179,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
             side = 'client'
         }
         else if (repoName.includes('api') || repoName.includes('server') || repoName.includes('backend')) {
-            side = 'server'
+            side = 'server';
         }
         return {
             script: scriptPath,
