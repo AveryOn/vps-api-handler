@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cd ~/services/spheres-dashboard
+npm run build
+
 # --- defaults (можно переопределить аргументами/ENV) ---
 SRC="${SRC:-$HOME/services/spheres-dashboard/dist}"
 DEST="${DEST:-/var/www/spheres-dashboard}"
