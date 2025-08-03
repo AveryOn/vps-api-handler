@@ -1,9 +1,20 @@
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { resolve } from 'path'
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  plugins: [
+    tsconfigPaths(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'src/services/scripts/*',
+          dest: 'scripts',
+        },
+      ],
+    }),
+  ],
   build: {
     ssr: resolve(__dirname, 'src/index.ts'),
     outDir: 'dist',

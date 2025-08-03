@@ -5,11 +5,30 @@ import { exec } from "child_process"
 import moment from "moment"
 import { DeploymentStore } from "../db/store"
 import { formatDate } from "../utils/datetime"
+import path from "path"
+import { __dirname } from "../const/global"
 
+
+enum ProjectsNames {
+    auth = 'auth',
+    deployments = 'vps-api-handler',
+    'spheres-dashboard' = 'spheres-dashboard',
+}
 /**
  * Общие правила при обработке вебхуков
  */
 const RULESET = {
+    /**
+     * Таблица сопоставления ключей формата **{имя-репозитория + [dev/prod]}**: **имя-файла-скрипта.sh (в ./scripts)**
+     */
+    scripts: {
+        [`${ProjectsNames.auth}-dev`]: 'auth-dev.sh',
+        [`${ProjectsNames.auth}-prod`]: 'auth-prod.sh',
+        [`${ProjectsNames.deployments}-prod`]: 'deployments.sh',
+        [`${ProjectsNames.deployments}-dev`]: 'deployments.sh',
+        [`${ProjectsNames['spheres-dashboard']}-prod`]: 'spheres-dashboard-prod.sh',
+        [`${ProjectsNames['spheres-dashboard']}-dev`]: 'spheres-dashboard-dev.sh',
+    },
     /**
      * Имена веток, которые допустимы для применения деплоя в среде
      */
@@ -166,12 +185,27 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
             main: 'PROD',
             master: 'PROD',
         } as const
-        // выбираем скрипт
-        const scriptPath =
-            branch === 'dev'
-                ? 'echo "dev"'
-                : 'echo "prod"';
 
+        const envBranches: Partial<Record<ENVIRONMENTS, typeof RULESET.enabled_branch_names[number][]>> = {
+            DEV: ['dev', 'develop'],
+            PROD: ['main', 'master', 'prod', 'production']
+        } as const
+        // выбираем скрипт
+        let scriptPath: string | null = null
+        if(envBranches.DEV.includes(branch as any)) {
+            scriptPath = RULESET.scripts[`${branch}-dev`]
+            if(scriptPath) {
+                scriptPath = path.join(__dirname, 'scripts', scriptPath)
+            }
+            else throw 'Не удалось сформировать путь до скрипта'
+        }
+        else if(envBranches.PROD.includes(branch as any)) {
+            scriptPath = RULESET.scripts[`${branch}-prod`]
+            if(scriptPath) {
+                scriptPath = path.join(__dirname, 'scripts', scriptPath)
+            }
+            else throw 'Не удалось сформировать путь до скрипта'
+        }
         let side: ExecuteDeploymentScript['side'] = null
         const repoName = repository.full_name.toLowerCase();
 
