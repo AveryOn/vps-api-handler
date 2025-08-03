@@ -176,7 +176,7 @@ export async function gitHubWebhookHandler(
  */
 function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository): ExecuteDeploymentScript {
     try {
-        console.debug(repository)
+        console.debug(repository);
         const environments: Partial<Record<typeof RULESET.enabled_branch_names[number], ENVIRONMENTS>> = {
             dev: 'DEV',
             develop: 'DEV',
