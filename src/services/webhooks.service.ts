@@ -179,6 +179,6 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
         }
     } catch (err) {
         console.error(err)
-        throw err
+        throw err;
     }
 }
