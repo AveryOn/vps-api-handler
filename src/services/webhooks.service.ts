@@ -163,11 +163,10 @@ export async function gitHubWebhookHandler(
                             end_at: formatDate(),
                             execution_time: String(Date.now() - nowMs),
                         })
-
+                        exec(`echo "pm2 restarting..." && bash pm2 restart ${ServiceNamesByProject[payload?.repository?.name]}`)
                         resolve(void 0);
                     })
                 })
-                exec(`echo "pm2 restarting..." && bash pm2 restart ${ServiceNamesByProject[payload?.repository?.name]}`)
             }
         }
     } catch (err) {
