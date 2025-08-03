@@ -35,6 +35,7 @@ export async function gitHubWebhookControllerGuard(req: Request): Promise<GitHub
         const signature = headers['x-hub-signature-256']
 
         if (!signature) {
+            console.error('[09] Error')
             throw 401
         }
 
@@ -44,16 +45,18 @@ export async function gitHubWebhookControllerGuard(req: Request): Promise<GitHub
         try {
             valid = await verifySignatureGitHub(secret, signature as string, payload)
         } catch (err) {
-            console.error('Error verifying signature:', err)
+            console.error('[08] Error', err)
             throw 401
         }
         if (!valid) {
+            console.error('[07] Error')
             throw 401
         }
 
         console.log('✅ Verified GitHub event:', req.headers['x-github-event'])
         const body: GitHubPushEventPayload = JSON.parse(req.body.toString('utf-8'))
         if (!body) {
+            console.error('[06] Error')
             throw 401
         }
         return {
@@ -61,6 +64,7 @@ export async function gitHubWebhookControllerGuard(req: Request): Promise<GitHub
             payload: body,
         }
     } catch (err) {
+        console.error('[05] Error', err)
         throw 401
     }
 }
@@ -73,12 +77,18 @@ export async function gitHubWebhookHandler(
     payload: GitHubPushEventPayload,
     event: string
 ): Promise<void> {
-    if (!payload?.repository || !event) throw 401
+    if (!payload?.repository || !event) {
+        console.error('[01] Error')
+        throw 401;
+    }
     try {
         if (event?.toLowerCase() === 'push') {
             // берем коммит, по которому будем деплоить
             const commitSha = payload.head_commit?.id
-            if (!commitSha) throw 400
+            if (!commitSha) {
+                console.error('[02] Error')
+                throw 400
+            }
 
             /** ветка на которую был push */
             const branch = payload.ref.replace('refs/heads/', '')
@@ -116,13 +126,13 @@ export async function gitHubWebhookHandler(
                     })
                     exec(cmd, async (err, stdout, stderr) => {
                         if (err) {
-                            console.error('❌ Deploy script failed:', stderr)
+                            console.error('[03] Error', stderr)
                             deployments.update(newDeployment.id, {
                                 status: 'failed',
                                 end_at: formatDate(),
                                 execution_time: String(Date.now() - nowMs),
                             })
-                            console.log('ERROR', err);
+                            console.log('[03-1] Error', err);
                             return reject(err)
                         }
                         console.log('✅ Deploy successful:', stdout)
@@ -137,6 +147,7 @@ export async function gitHubWebhookHandler(
             }
         }
     } catch (err) {
+        console.error('[04] Error', err)
         throw 401
     }
 }
@@ -178,7 +189,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
             side: side,
         }
     } catch (err) {
-        console.error(err)
+        console.error('[010] Error', err)
         throw err;
     }
 }
