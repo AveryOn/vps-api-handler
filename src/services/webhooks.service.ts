@@ -93,7 +93,7 @@ export async function gitHubWebhookHandler(
             /** ветка на которую был push */
             const branch = payload.ref.replace('refs/heads/', '')
             const configs = [
-                pushForSoundSphereEngRepo(branch, payload?.repository)
+                pushForSoundSphereEngRepo(branch, payload?.repository),
             ]
 
             const formattedDate = moment(Date.now()).format('DD.MM.YYYY_HH-mm-ss')
