@@ -11,7 +11,7 @@ import { __dirname } from "../const/global"
 
 enum ProjectsNames {
     auth = 'auth',
-    deployments = 'vps-api-handler',
+    'vps-api-handler' = 'vps-api-handler',
     'spheres-dashboard' = 'spheres-dashboard',
 }
 /**
@@ -24,8 +24,8 @@ const RULESET = {
     scripts: {
         [`${ProjectsNames.auth}-dev`]: 'auth-dev.sh',
         [`${ProjectsNames.auth}-prod`]: 'auth-prod.sh',
-        [`${ProjectsNames.deployments}-prod`]: 'deployments.sh',
-        [`${ProjectsNames.deployments}-dev`]: 'deployments.sh',
+        [`${ProjectsNames['vps-api-handler']}-prod`]: 'deployments.sh',
+        [`${ProjectsNames['vps-api-handler']}-dev`]: 'deployments.sh',
         [`${ProjectsNames['spheres-dashboard']}-prod`]: 'spheres-dashboard-prod.sh',
         [`${ProjectsNames['spheres-dashboard']}-dev`]: 'spheres-dashboard-dev.sh',
     },
