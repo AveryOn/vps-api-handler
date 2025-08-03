@@ -101,7 +101,7 @@ export async function gitHubWebhookHandler(
     event: string
 ): Promise<void> {
     if (!payload?.repository || !event) {
-        console.error('[01] Error')
+        console.error('[01] Error');
         throw 401;
     }
     try {
