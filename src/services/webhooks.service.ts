@@ -192,7 +192,7 @@ function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository)
         // выбираем скрипт
         let scriptPath: string | null = null
         if(envBranches.DEV.includes(branch as any)) {
-            scriptPath = RULESET.scripts[`${repository.name}-dev`]
+            scriptPath = RULESET.scripts[`${repository.name}-dev`];
             console.debug('KEY-NAME', `${repository.name}-dev`)
             if(scriptPath) {
                 scriptPath = path.join(__dirname, 'scripts', scriptPath)
