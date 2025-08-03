@@ -159,6 +159,7 @@ export async function gitHubWebhookHandler(
                         }
                         console.log('✅ Deploy successful:', stdout)
                         console.log('pm2 restarting...')
+                        exec(`bash -lc 'source ~/.nvm/nvm.sh && pm2 reload ${ServiceNamesByProject[payload?.repository?.name]}`)
                         deployments.update(newDeployment.id, {
                             status: 'success',
                             end_at: formatDate(),
@@ -167,7 +168,6 @@ export async function gitHubWebhookHandler(
                         resolve(void 0);
                     })
                 })
-                // exec(`bash -lc 'source ~/.nvm/nvm.sh && pm2 reload ${ServiceNamesByProject[payload?.repository?.name]}`)
             }
         }
     } catch (err) {
