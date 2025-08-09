@@ -13,10 +13,14 @@ enum ProjectsNames {
     auth = 'auth',
     'vps-api-handler' = 'vps-api-handler',
     'spheres-dashboard' = 'spheres-dashboard',
+    'music-ui' = 'music-ui',
+    'music-api' = 'music-api',
 }
 const ServiceNamesByProject = {
     [ProjectsNames["vps-api-handler"]]: 'deployments',
     [ProjectsNames["spheres-dashboard"]]: 'spheres-dashboard',
+    [ProjectsNames["music-ui"]]: 'music-ui',
+    [ProjectsNames["music-api"]]: 'music-api',
 } as const
 /**
  * Общие правила при обработке вебхуков
@@ -32,6 +36,11 @@ const RULESET = {
         [`${ProjectsNames['vps-api-handler']}-dev`]: 'deployments.sh',
         [`${ProjectsNames['spheres-dashboard']}-prod`]: 'spheres-dashboard-prod.sh',
         [`${ProjectsNames['spheres-dashboard']}-dev`]: 'spheres-dashboard-dev.sh',
+
+        [`${ProjectsNames['music-ui']}-dev`]: 'music-ui-dev.sh',
+        [`${ProjectsNames['music-ui']}-prod`]: 'music-ui-prod.sh',
+        [`${ProjectsNames['music-api']}-dev`]: 'music-api-dev.sh',
+        [`${ProjectsNames['music-api']}-prod`]: 'music-api-prod.sh',
     },
     /**
      * Имена веток, которые допустимы для применения деплоя в среде
@@ -116,7 +125,7 @@ export async function gitHubWebhookHandler(
             /** ветка на которую был push */
             const branch = payload.ref.replace('refs/heads/', '')
             const configs = [
-                pushForSoundSphereEngRepo(branch, payload?.repository),
+                pushRepo(branch, payload?.repository),
             ]
 
             const formattedDate = moment(Date.now()).format('DD.MM.YYYY_HH-mm-ss')
@@ -178,9 +187,9 @@ export async function gitHubWebhookHandler(
 }
 
 /**
- * Инкапсулирует логику вызова deploy скрипта для проекта sound-sphere-eng
+ * Инкапсулирует логику вызова deploy скрипта для проектов
  */
-function pushForSoundSphereEngRepo(branch: string, repository: GitHubRepository): ExecuteDeploymentScript {
+function pushRepo(branch: string, repository: GitHubRepository): ExecuteDeploymentScript {
     try {
         const environments: Partial<Record<typeof RULESET.enabled_branch_names[number], ENVIRONMENTS>> = {
             dev: 'DEV',
