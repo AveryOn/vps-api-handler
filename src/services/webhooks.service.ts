@@ -226,7 +226,7 @@ function pushRepo(branch: string, repository: GitHubRepository): ExecuteDeployme
         const repoName = repository.name.toLowerCase();
 
         // Опеределяем какой репозиторий обновили клиентский или серверный
-        if (repoName.includes('client') || repoName.includes('front')) {
+        if (repoName.includes('client') || repoName.includes('front') || repoName.includes('ui')) {
             side = 'client';
         }
         else if (repoName.includes('api') || repoName.includes('server') || repoName.includes('backend')) {
