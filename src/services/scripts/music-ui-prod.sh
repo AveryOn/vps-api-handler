@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SRC="$HOME/services/music/music-ui/dist/"
-DEST="/var/www/project"
+DEST="/var/www/music"
 
 cd "$HOME/services/music/music-ui/"
 npm run build
