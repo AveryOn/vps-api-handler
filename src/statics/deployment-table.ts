@@ -53,8 +53,7 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
         </table>
         <script nonce="${nonce}">
             async function load() {
-                console.log(window.location.search)
-                const res = await fetch('${sourceUrl}')
+                const res = await fetch('${sourceUrl}' + window.location.search)
                 const data = await res.json()
                 const body = document.querySelector('#tbl tbody')
                 body.innerHTML = data.map(d => \`
