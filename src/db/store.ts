@@ -105,8 +105,6 @@ export class DeploymentStore {
 
     /** Возвращает все деплои (по number по возрастанию) */
     findAll({ limit = 15, offset = 0 } = {}): Deployment[] {
-        console.debug('[findAll]: limit/offser', { limit, offset })
-        
         try {
             return this.db
                 .prepare(`

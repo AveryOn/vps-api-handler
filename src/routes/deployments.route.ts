@@ -111,8 +111,6 @@ router.get('/history', (req, res) => {
       </tr>
     `).join('')
 
-    console.debug('[GET: /deployments/history] => ROWS LENGTH', rows.length)
-
     const html = initTabelClient(rows, nonce, '/deployments')
     // 4) Отдать HTML, вставив nonce в оба тега
     res.send(html)
