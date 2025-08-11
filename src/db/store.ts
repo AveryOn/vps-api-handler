@@ -113,7 +113,7 @@ export class DeploymentStore {
                     ORDER BY number DESC
                     LIMIT @limit OFFSET @offset
                 `)
-                .all({ limit, offset }) as Deployment[]
+                .all([limit, offset]) as Deployment[]
         } catch (err) {
             console.error('[findAll]:', err)
             throw err
