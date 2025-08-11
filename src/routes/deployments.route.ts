@@ -87,7 +87,7 @@ router.get('/history', (req, res) => {
     const offset = (page - 1) * limit;
 
     // 3) Построить строки таблицы
-    const rows = deployments.findAll().map(d => `
+    const rows = deployments.findAll({ limit, offset }).map(d => `
       <tr>
         <td>${d.number}</td>
         <td>${d.commit_name}</td>
