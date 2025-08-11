@@ -105,15 +105,18 @@ export class DeploymentStore {
 
     /** Возвращает все деплои (по number по возрастанию) */
     findAll({ limit = 15, offset = 0 } = {}): Deployment[] {
+        console.debug('[findAll]: limit/offser', { limit, offset })
+        
         try {
             return this.db
                 .prepare(`
                     SELECT * 
                     FROM deployments
                     ORDER BY number DESC
-                    LIMIT @limit OFFSET @offset
+                    -- LIMIT @limit OFFSET @offset
+                    LIMIT ? OFFSET ?
                 `)
-                .all({ limit, offset }) as Deployment[]
+                .all(limit, offset) as Deployment[]
         } catch (err) {
             console.error('[findAll]:', err)
             throw err
