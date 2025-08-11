@@ -18,11 +18,17 @@ runMigrations(DB_NAME)
  */
 router.get('/', (req, res) => {
     const commit_hash = req.query['commit_hash']
+    const LIMIT = 15
+    const PAGE = 1
+    const limit = Math.max(1, parseInt(req.query['limit'] as string || `${LIMIT}`, 10) || LIMIT);
+    const page  = Math.max(1, parseInt(req.query['page'] as string  || `${PAGE}`,  10) || PAGE);
+    const offset = (page - 1) * limit;
+
     if (commit_hash) {
         res.json(deployments.findByHash(commit_hash as string))
         return
     }
-    res.json(deployments.findAll())
+    res.json(deployments.findAll({ limit, offset }))
 })
 
 /**
@@ -81,9 +87,8 @@ router.get('/history', (req, res) => {
 
     const LIMIT = 15
     const PAGE = 1
-    const q = new URLSearchParams(req.url.split('?')[1] || '');
-    const limit = Math.max(1, parseInt(req.query.limit as string || `${LIMIT}`, 10) || LIMIT);
-    const page  = Math.max(1, parseInt(req.query.page as string  || `${PAGE}`,  10) || PAGE);
+    const limit = Math.max(1, parseInt(req.query['limit'] as string || `${LIMIT}`, 10) || LIMIT);
+    const page  = Math.max(1, parseInt(req.query['page'] as string  || `${PAGE}`,  10) || PAGE);
     const offset = (page - 1) * limit;
 
     console.debug('[GET: /deployments/history] => paginate-info', { limit, page, offset, })
