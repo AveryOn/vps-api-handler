@@ -86,6 +86,8 @@ router.get('/history', (req, res) => {
     const page  = Math.max(1, parseInt(q.get('page')  || `${PAGE}`,  10) || PAGE);
     const offset = (page - 1) * limit;
 
+    console.debug('[GET: /deployments/history] => paginate-info', { limit, page, offset, })
+
     // 3) Построить строки таблицы
     const rows = deployments.findAll({ limit, offset }).map(d => `
       <tr>
@@ -104,7 +106,7 @@ router.get('/history', (req, res) => {
       </tr>
     `).join('')
 
-    console.debug('[GET: /deployments/history] => ', rows)
+    console.debug('[GET: /deployments/history] => ROWS LENGTH', rows.length)
 
     const html = initTabelClient(rows, nonce, '/deployments')
     // 4) Отдать HTML, вставив nonce в оба тега
