@@ -52,6 +52,8 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
             </tbody>
         </table>
         <script nonce="${nonce}">
+            const params = new URLSearchParams(window.location.search);
+            const interval = Number(params.get('interval').trim()) || 5000;
             async function load() {
                 const res = await fetch('${sourceUrl}' + window.location.search)
                 const data = await res.json()
@@ -74,13 +76,14 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
                 ).join('')
             }
             load()
-            setInterval(load, ${interval})
+            setInterval(load, interval)
 
             const params = new URLSearchParams(window.location.search);
 
             // Устанавливаем дефолты, если их нет
             if (!params.has('page')) params.set('page', '1');
             if (!params.has('limit')) params.set('limit', '15');
+            if (!params.has('interval')) params.set('interval', '5000');
             if (!window.location.search) {
                 history.replaceState({}, '', window.location.pathname + '?' + params.toString());
             }
