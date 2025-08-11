@@ -53,7 +53,7 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
         </table>
         <script nonce="${nonce}">
             const params = new URLSearchParams(window.location.search);
-            const interval = Number(params.get('interval').trim()) || 5000;
+            const interval = Number(params.get('interval')?.trim()) || 5000;
             async function load() {
                 const res = await fetch('${sourceUrl}' + window.location.search)
                 const data = await res.json()
