@@ -79,6 +79,13 @@ router.get('/history', (req, res) => {
         ].join('; ')
     )
 
+    const LIMIT = 15
+    const PAGE = 1
+    const q = new URLSearchParams(req.url.split('?')[1] || '');
+    const limit = Math.max(1, parseInt(q.get('limit') || `${LIMIT}`, 10) || LIMIT);
+    const page  = Math.max(1, parseInt(q.get('page')  || `${PAGE}`,  10) || PAGE);
+    const offset = (page - 1) * limit;
+
     // 3) Построить строки таблицы
     const rows = deployments.findAll().map(d => `
       <tr>
@@ -96,6 +103,8 @@ router.get('/history', (req, res) => {
         <td>${d.end_at || '-'}</td>
       </tr>
     `).join('')
+
+    console.debug('[GET: /deployments/history] => ', rows)
 
     const html = initTabelClient(rows, nonce, '/deployments')
     // 4) Отдать HTML, вставив nonce в оба тега

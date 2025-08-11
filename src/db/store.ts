@@ -55,8 +55,8 @@ export class DeploymentStore {
         const findedDuplicate = this.db
             .prepare('SELECT * FROM deployments WHERE commit_name = ?')
             .get([dep.commit_name]) as Deployment | undefined
-        
-        if(findedDuplicate) {
+
+        if (findedDuplicate) {
             console.error('duplicate row')
             throw 'duplicate row'
         }
@@ -104,16 +104,21 @@ export class DeploymentStore {
     }
 
     /** Возвращает все деплои (по number по возрастанию) */
-    findAll(): Deployment[] {
-        return this.db
-          .prepare(`
-            SELECT * 
-            FROM deployments
-            ORDER BY 
-              number DESC
-          `)
-          .all() as Deployment[]
-      }
+    findAll({ limit = 15, offset = 0 } = {}): Deployment[] {
+        try {
+            return this.db
+                .prepare(`
+                    SELECT * 
+                    FROM deployments
+                    ORDER BY number DESC
+                    LIMIT @limit OFFSET @offset
+                `)
+                .all({ limit, offset }) as Deployment[]
+        } catch (err) {
+            console.error('[findAll]:', err)
+            throw err
+        }
+    }
 
     /** Находит деплой по id */
     findById(id: string): Deployment | undefined {

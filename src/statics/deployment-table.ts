@@ -4,7 +4,7 @@
  * @param tableValue html разметка `tr`/`td` с готовыми значениями
  * @returns готовый html разметка в виде строки
  */
-export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '/deployments') {
+export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '/deployments', interval=5000) {
     const html = `<!DOCTYPE html>
         <html lang="ru">
         <head>
@@ -34,6 +34,10 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
         </head>
         <body>
         <h1>▶Deployment History</h1>
+        <div class="filters">
+            Limit: <input type="text" id="limitInput">
+            Page: <input type="text" id="pageInput">
+        </div>
         <table id="tbl">
             <thead>
             <tr>
@@ -49,28 +53,63 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
         </table>
         <script nonce="${nonce}">
             async function load() {
-            const res = await fetch('${sourceUrl}')
-            const data = await res.json()
-            const body = document.querySelector('#tbl tbody')
-            body.innerHTML = data.map(d => \`
-                <tr>
-                <td id="td-number">\${d.number}</td>
-                <td id="td-commit-name">\${d.commit_name}</td>
-                <td>\${d.commit_hash}</td>
-                <td>\${d.branch}</td>
-                <td>\${d.script}</td>
-                <td>\${d.status}</td>
-                <td>\${d.created_at}</td>
-                <td>\${d.side||'-'}</td>
-                <td>\${d.environment||'-'}</td>
-                <td>\${d.execution_time||'-'}</td>
-                <td>\${d.namespace||'-'}</td>
-                <td>\${d.end_at||'-'}</td>
-                </tr>\`
-            ).join('')
+                const res = await fetch('${sourceUrl}')
+                const data = await res.json()
+                const body = document.querySelector('#tbl tbody')
+                body.innerHTML = data.map(d => \`
+                    <tr>
+                    <td id="td-number">\${d.number}</td>
+                    <td id="td-commit-name">\${d.commit_name}</td>
+                    <td>\${d.commit_hash}</td>
+                    <td>\${d.branch}</td>
+                    <td>\${d.script}</td>
+                    <td>\${d.status}</td>
+                    <td>\${d.created_at}</td>
+                    <td>\${d.side||'-'}</td>
+                    <td>\${d.environment||'-'}</td>
+                    <td>\${d.execution_time||'-'}</td>
+                    <td>\${d.namespace||'-'}</td>
+                    <td>\${d.end_at||'-'}</td>
+                    </tr>\`
+                ).join('')
             }
             load()
-            setInterval(load, 5000)
+            setInterval(load, ${interval})
+
+            const params = new URLSearchParams(window.location.search);
+
+            // Устанавливаем дефолты, если их нет
+            if (!params.has('page')) params.set('page', '1');
+            if (!params.has('limit')) params.set('limit', '15');
+            if (!window.location.search) {
+                history.replaceState({}, '', window.location.pathname + '?' + params.toString());
+            }
+
+            const limitInput = document.getElementById('limitInput');
+            const pageInput = document.getElementById('pageInput');
+            // Установить значения из query
+            limitInput.value = params.get('limit') || '';
+            pageInput.value = params.get('page') || '';
+
+            function updateParam(name, value) {
+                if (value && !Object.is(Number(value), Number.NaN)) {
+                    params.set(name, value);
+                } else {
+                    params.delete(name);
+                }
+                const newUrl = window.location.pathname + '?' + params.toString();
+                history.replaceState({}, '', newUrl);
+            }
+
+            limitInput.addEventListener('blur', () => {
+                updateParam('limit', limitInput.value.trim());
+                location.reload();
+            });
+
+            pageInput.addEventListener('blur', () => {
+                updateParam('page', pageInput.value.trim());
+                location.reload();
+            });
         </script>
         </body>
         </html>
