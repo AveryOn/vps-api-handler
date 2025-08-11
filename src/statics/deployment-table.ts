@@ -78,8 +78,6 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
             load()
             setInterval(load, interval)
 
-            const params = new URLSearchParams(window.location.search);
-
             // Устанавливаем дефолты, если их нет
             if (!params.has('page')) params.set('page', '1');
             if (!params.has('limit')) params.set('limit', '15');
