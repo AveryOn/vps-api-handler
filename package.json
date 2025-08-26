@@ -8,9 +8,9 @@
     "dev": "nodemon",
     "build": "vite build",
     "start": "node dist/index.cjs",
-    "pm2:start": "pm2 start npm --name deployments -- run start",
-    "pm2:stop": "pm2 stop deployments",
-    "pm2:restart": "pm2 restart deployments"
+    "pm2:start": "pm2 start npm --name ${DEPLOYMENTS_SUBDOMAIN} -- run start",
+    "pm2:stop": "pm2 stop ${DEPLOYMENTS_SUBDOMAIN}",
+    "pm2:restart": "pm2 restart ${DEPLOYMENTS_SUBDOMAIN}"
   },
   "keywords": [],
   "author": "",

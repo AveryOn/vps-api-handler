@@ -10,6 +10,11 @@ config()
 
 const app = express()
 const PORT = process.env.PORT ?? 4000
+
+console.debug({
+  PORT, 
+  WEBHOOKS_SECRET: process.env.WEBHOOKS_SECRET,
+})
 app.set('trust proxy', 1);
 // CORS
 app.use(cors({
