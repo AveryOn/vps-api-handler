@@ -234,7 +234,7 @@ function pushRepo(branch: string, repository: GitHubRepository): ExecuteDeployme
         if (repoName.includes('client') || repoName.includes('front') || repoName.includes('ui')) {
             side = 'client';
         }
-        else if (repoName.includes('api') || repoName.includes('server') || repoName.includes('backend')) {
+        else if (repoName.includes('api') || repoName.includes('server') || repoName.includes('backend') || repoName.includes('service')) {
             side = 'server';
         }
         return {
