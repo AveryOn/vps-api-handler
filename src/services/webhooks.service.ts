@@ -15,12 +15,14 @@ enum ProjectsNames {
     'spheres-dashboard' = 'spheres-dashboard',
     'music-ui' = 'music-ui',
     'music-api' = 'music-api',
+    'tg-channel-service' = 'tg-channel-service',
 }
 const ServiceNamesByProject = {
     [ProjectsNames["vps-api-handler"]]: 'deployments',
     [ProjectsNames["spheres-dashboard"]]: 'spheres-dashboard',
     [ProjectsNames["music-ui"]]: 'music-ui',
     [ProjectsNames["music-api"]]: 'music-api',
+    [ProjectsNames["tg-channel-service"]]: 'tg-channel-service',
 } as const
 /**
  * Общие правила при обработке вебхуков
@@ -41,6 +43,9 @@ const RULESET = {
         [`${ProjectsNames['music-ui']}-prod`]: 'music-ui-prod.sh',
         [`${ProjectsNames['music-api']}-dev`]: 'music-api-dev.sh',
         [`${ProjectsNames['music-api']}-prod`]: 'music-api-prod.sh',
+
+        [`${ProjectsNames['tg-channel-service']}-prod`]: 'tg-channel-service-prod.sh',
+        [`${ProjectsNames['tg-channel-service']}-dev`]: 'tg-channel-service-dev.sh',
     },
     /**
      * Имена веток, которые допустимы для применения деплоя в среде
