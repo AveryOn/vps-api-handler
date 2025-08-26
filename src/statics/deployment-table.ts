@@ -62,16 +62,16 @@ export function initTabelClient(tableValue: string, nonce: string, sourceUrl = '
                     <tr>
                     <td id="td-number">\${d.number}</td>
                     <td id="td-commit-name" title="\${d.commit_name}">\${d.commit_name}</td>
-                    <td>\${d.commit_hash}</td>
-                    <td>\${d.branch}</td>
-                    <td>\${d.script}</td>
-                    <td>\${d.status}</td>
-                    <td>\${d.created_at}</td>
-                    <td>\${d.side||'-'}</td>
-                    <td>\${d.environment||'-'}</td>
-                    <td>\${d.execution_time||'-'}</td>
-                    <td>\${d.namespace||'-'}</td>
-                    <td>\${d.end_at||'-'}</td>
+                    <td title="\${d.commit_hash || '-'}">\${d.commit_hash}</td>
+                    <td title="\${d.branch || '-'}">\${d.branch}</td>
+                    <td title="\${d.script || '-'}">\${d.script}</td>
+                    <td title="\${d.status || '-'}">\${d.status}</td>
+                    <td title="\${d.created_at || '-'}">\${d.created_at}</td>
+                    <td title="\${d.side || '-'}">\${d.side||'-'}</td>
+                    <td title="\${d.environment || '-'}">\${d.environment||'-'}</td>
+                    <td title="\${d.execution_time || '-'}">\${d.execution_time||'-'}</td>
+                    <td title="\${d.namespace || '-'}">\${d.namespace||'-'}</td>
+                    <td title="\${d.end_at || '-'}">\${d.end_at||'-'}</td>
                     </tr>\`
                 ).join('')
             }
