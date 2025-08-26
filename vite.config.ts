@@ -12,6 +12,10 @@ export default defineConfig({
           src: 'src/services/scripts/*',
           dest: 'scripts',
         },
+        {
+          src: 'src/deploy/*',
+          dest: 'deploy',
+        },
       ],
     }),
   ],
